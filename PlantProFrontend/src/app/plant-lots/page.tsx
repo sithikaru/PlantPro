@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { plantLotsApi, plantSpeciesApi, zonesApi } from '../../lib/api';
 import { PlantLot, PlantSpecies, Zone } from '../../lib/types';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 
 export default function PlantLotsPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
