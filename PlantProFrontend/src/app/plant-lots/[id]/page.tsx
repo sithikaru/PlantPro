@@ -308,11 +308,11 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {plantLot.qrCode ? (
+                  {plantLot.qrCodeImage ? (
                     <div className="text-center">
                       <div className="mb-4">
                         <img
-                          src={plantLot.qrCode}
+                          src={plantLot.qrCodeImage}
                           alt="Plant Lot QR Code"
                           className="mx-auto border border-green-200 rounded-lg"
                           width="200"
@@ -325,7 +325,7 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                       <Button
                         onClick={() => {
                           const link = document.createElement('a');
-                          link.href = plantLot.qrCode;
+                          link.href = plantLot.qrCodeImage!;
                           link.download = `plant-lot-${plantLot.lotNumber}-qr.png`;
                           link.click();
                         }}

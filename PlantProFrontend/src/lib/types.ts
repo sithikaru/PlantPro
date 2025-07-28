@@ -56,6 +56,7 @@ export interface PlantLot {
   id: number;
   lotNumber: string;
   qrCode: string;
+  qrCodeImage?: string; // For storing the QR code image data URL
   plantCount: number;
   plantedDate: string;
   expectedHarvestDate?: string;
