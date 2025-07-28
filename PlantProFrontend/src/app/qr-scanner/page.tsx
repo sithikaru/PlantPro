@@ -93,7 +93,21 @@ export default function QRScannerPage() {
       setScannedCode(qrCode);
       setError(null);
       
-      // Try to find the plant lot by QR code
+      // Try to parse the QR code as JSON first (new format)
+      try {
+        const qrData = JSON.parse(qrCode);
+        if (qrData.lotId) {
+          // New format: QR code contains JSON with lotId
+          const lot = await plantLotsApi.getById(qrData.lotId);
+          setPlantLot(lot);
+          stopCamera();
+          return;
+        }
+      } catch (parseError) {
+        // Not JSON, try as plain QR code string (old format)
+      }
+      
+      // Try to find the plant lot by QR code string (fallback for old format)
       const lot = await plantLotsApi.getByQrCode(qrCode);
       setPlantLot(lot);
       stopCamera();
