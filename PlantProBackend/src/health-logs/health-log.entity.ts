@@ -48,7 +48,7 @@ export class HealthLog {
   analysisStatus: AnalysisStatus;
 
   @Column({ type: 'json', nullable: true })
-  aiAnalysis: {
+  aiAnalysis?: {
     healthScore?: number; // 0-100
     diseaseDetected?: boolean;
     diseaseType?: string;
@@ -60,10 +60,10 @@ export class HealthLog {
       confidence: number;
       location?: { x: number; y: number; width: number; height: number };
     }[];
-  };
+  } | null;
 
   @Column({ type: 'text', nullable: true })
-  aiRawResponse: string; // Store raw AI service response for debugging
+  aiRawResponse?: string | null; // Store raw AI service response for debugging
 
   @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
   latitude: number;
