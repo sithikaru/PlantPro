@@ -13,7 +13,11 @@ import {
   Zone,
   HealthLog,
   CreateHealthLogData,
-  UpdateHealthLogData
+  UpdateHealthLogData,
+  CreateUserData,
+  UpdateUserData,
+  ChangePasswordData,
+  UserStats
 } from './types';
 
 // Auth API
@@ -93,6 +97,27 @@ export const usersApi = {
   
   getAll: (): Promise<User[]> =>
     apiClient.get('/users'),
+
+  getById: (id: number): Promise<User> =>
+    apiClient.get(`/users/${id}`),
+
+  getStats: (): Promise<UserStats> =>
+    apiClient.get('/users/stats'),
+
+  create: (data: CreateUserData): Promise<User> =>
+    apiClient.post('/users', data),
+
+  update: (id: number, data: UpdateUserData): Promise<User> =>
+    apiClient.patch(`/users/${id}`, data),
+
+  changePassword: (id: number, data: ChangePasswordData): Promise<void> =>
+    apiClient.patch(`/users/${id}/change-password`, data),
+
+  toggleStatus: (id: number): Promise<User> =>
+    apiClient.patch(`/users/${id}/toggle-status`),
+
+  deleteUser: (id: number): Promise<void> =>
+    apiClient.delete(`/users/${id}`),
 };
 
 // Health Logs API

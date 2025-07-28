@@ -20,6 +20,10 @@ export interface User {
   role: 'manager' | 'field_staff' | 'analytics';
   phoneNumber?: string;
   isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  assignedPlantLotsCount?: number;
+  healthLogsCount?: number;
 }
 
 export interface AuthResponse {
@@ -197,4 +201,38 @@ export interface PaginatedResponse<T> {
     total: number;
     totalPages: number;
   };
+}
+
+// User management types
+export interface CreateUserData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: 'manager' | 'field_staff' | 'analytics';
+  phoneNumber?: string;
+}
+
+export interface UpdateUserData {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: 'manager' | 'field_staff' | 'analytics';
+  phoneNumber?: string;
+}
+
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface UserStats {
+  total: number;
+  byRole: {
+    manager: number;
+    field_staff: number;
+    analytics: number;
+  };
+  active: number;
+  inactive: number;
 }
