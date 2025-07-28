@@ -402,7 +402,7 @@ export class DashboardService {
     const overdueLots = await this.plantLotRepository.count({
       where: {
         expectedHarvestDate: Between(new Date(0), new Date()),
-        status: 'GROWING',
+        status: PlantStatus.GROWING,
       },
     });
 
@@ -414,7 +414,7 @@ export class DashboardService {
 
   private async getUserActivitySummary() {
     const activeFieldStaff = await this.userRepository.count({
-      where: { role: 'FIELD_STAFF', isActive: true },
+      where: { role: UserRole.FIELD_STAFF, isActive: true },
     });
 
     const recentScans = await this.plantLotRepository.count({
@@ -444,19 +444,19 @@ export class DashboardService {
 
   private async getSystemHealthSummary() {
     const totalAnalysis = await this.healthLogRepository.count({
-      where: { analysisStatus: ['COMPLETED', 'FAILED'] },
+      where: { analysisStatus: In([AnalysisStatus.COMPLETED, AnalysisStatus.FAILED]) },
     });
 
     const successfulAnalysis = await this.healthLogRepository.count({
-      where: { analysisStatus: 'COMPLETED' },
+      where: { analysisStatus: AnalysisStatus.COMPLETED },
     });
 
     const pendingAnalysis = await this.healthLogRepository.count({
-      where: { analysisStatus: 'PENDING' },
+      where: { analysisStatus: AnalysisStatus.PENDING },
     });
 
     const failedAnalysis = await this.healthLogRepository.count({
-      where: { analysisStatus: 'FAILED' },
+      where: { analysisStatus: AnalysisStatus.FAILED },
     });
 
     return {
