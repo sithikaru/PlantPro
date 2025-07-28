@@ -8,8 +8,21 @@ import { plantLotsApi, plantSpeciesApi, zonesApi } from '../../lib/api';
 import { PlantLot, PlantSpecies, Zone } from '../../lib/types';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { 
+  ArrowLeft, 
+  Leaf, 
+  Plus,
+  Activity,
+  BarChart3,
+  Scan,
+  Edit3,
+  Eye,
+  MapPin,
+  Search,
+  Filter
+} from 'lucide-react';
 
 export default function PlantLotsPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -61,7 +74,7 @@ export default function PlantLotsPage() {
       setPlantSpecies(speciesResponse);
       setZones(zonesResponse);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch data');
+      setError(err instanceof Error ? err.message : 'Failed to fetch plant lots');
     } finally {
       setLoading(false);
     }
@@ -92,11 +105,15 @@ export default function PlantLotsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
-          <p className="mt-4 text-gray-600">Loading plant lots...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-96 border-0 shadow-xl rounded-3xl">
+          <CardContent className="p-8">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto"></div>
+              <p className="mt-6 text-gray-600 font-medium">Loading plant lots...</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -108,42 +125,80 @@ export default function PlantLotsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white shadow-sm border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-green-600 hover:text-green-700">
-                ← Back to Dashboard
-              </Link>
-              <h1 className="text-xl font-semibold text-gray-900">Plant Lots</h1>
+            <div className="flex items-center space-x-6">
+              <Button asChild variant="ghost" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full px-4">
+                <Link href="/dashboard">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+              <div className="h-6 w-px bg-gray-200"></div>
+              <h1 className="text-2xl font-bold text-gray-900 font-['Inter'] tracking-tight">
+                Plant Lots
+              </h1>
             </div>
             <div className="flex items-center space-x-4">
               {canManage && (
-                <Link
-                  href="/plant-lots/create"
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Create New Plant Lot
-                </Link>
+                <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Link href="/plant-lots/create">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New Plant Lot
+                  </Link>
+                </Button>
               )}
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Filters */}
-          <div className="bg-white shadow rounded-lg mb-6">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Filters
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="zone" className="block text-sm font-medium text-gray-700">
+      {/* Sidebar Navigation */}
+      <div className="fixed left-6 top-1/2 transform -translate-y-1/2 z-10 hidden lg:block">
+        <div className="flex flex-col space-y-4">
+          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
+            <Link href="/dashboard">
+              <BarChart3 className="h-5 w-5 text-gray-600" />
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
+            <Link href="/qr-scanner">
+              <Scan className="h-5 w-5 text-gray-600" />
+            </Link>
+          </Button>
+          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-green-50 w-12 h-12">
+            <Leaf className="h-5 w-5 text-green-600" />
+          </Button>
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto py-12 px-6 lg:px-8">
+        <div className="space-y-8">
+          {/* Page Header */}
+          <div className="text-center">
+            <h2 className="text-4xl font-bold text-gray-900 mb-3 font-['Inter'] tracking-tight">
+              Plant Lot Management
+            </h2>
+            <p className="text-xl text-gray-600 font-light leading-relaxed">
+              Monitor and manage all plant lots across your plantation
+            </p>
+          </div>
+
+          {/* Filters Card */}
+          <Card className="border-0 shadow-xl rounded-3xl bg-white">
+            <CardHeader className="pb-6">
+              <CardTitle className="text-2xl font-bold text-gray-900 flex items-center">
+                <Filter className="mr-3 h-6 w-6 text-blue-600" />
+                Filter Plant Lots
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="zone" className="text-gray-700 font-medium text-sm">
                     Zone
-                  </label>
+                  </Label>
                   <select
                     id="zone"
                     value={selectedZone}
@@ -151,7 +206,7 @@ export default function PlantLotsPage() {
                       setSelectedZone(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-green-500 focus:ring-0 font-medium h-12"
                   >
                     <option value="">All Zones</option>
                     {zones.map((zone) => (
@@ -162,10 +217,10 @@ export default function PlantLotsPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label htmlFor="species" className="block text-sm font-medium text-gray-700">
+                <div className="space-y-2">
+                  <Label htmlFor="species" className="text-gray-700 font-medium text-sm">
                     Species
-                  </label>
+                  </Label>
                   <select
                     id="species"
                     value={selectedSpecies}
@@ -173,7 +228,7 @@ export default function PlantLotsPage() {
                       setSelectedSpecies(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-green-500 focus:ring-0 font-medium h-12"
                   >
                     <option value="">All Species</option>
                     {plantSpecies.map((species) => (
@@ -184,10 +239,10 @@ export default function PlantLotsPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+                <div className="space-y-2">
+                  <Label htmlFor="status" className="text-gray-700 font-medium text-sm">
                     Status
-                  </label>
+                  </Label>
                   <select
                     id="status"
                     value={selectedStatus}
@@ -195,7 +250,7 @@ export default function PlantLotsPage() {
                       setSelectedStatus(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:border-green-500 focus:ring-0 font-medium h-12"
                   >
                     <option value="">All Statuses</option>
                     <option value="seedling">Seedling</option>
@@ -208,162 +263,155 @@ export default function PlantLotsPage() {
                   </select>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-              {error}
-            </div>
+            <Card className="border-0 shadow-lg rounded-3xl bg-red-50 border-l-4 border-l-red-500">
+              <CardContent className="p-6">
+                <div className="text-red-700 font-medium">{error}</div>
+              </CardContent>
+            </Card>
           )}
 
-          {/* Plant Lots Table */}
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Lot Details
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Location
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Plant Count
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Yield
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {plantLots.map((lot) => (
-                    <tr key={lot.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+          {/* Plant Lots Grid */}
+          {plantLots.length > 0 ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {plantLots.map((lot) => (
+                  <Card key={lot.id} className="border-0 shadow-xl rounded-3xl bg-white hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start justify-between">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <CardTitle className="text-xl font-bold text-gray-900 mb-2">
                             {lot.lotNumber}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {lot.species?.name || `Species ID: ${lot.speciesId}`}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            Planted: {new Date(lot.plantedDate).toLocaleDateString()}
+                          </CardTitle>
+                          <div className="space-y-1">
+                            <p className="text-sm text-gray-600">
+                              {lot.species?.name || `Species ID: ${lot.speciesId}`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Planted: {new Date(lot.plantedDate).toLocaleDateString()}
+                            </p>
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {lot.zone?.name || `Zone ID: ${lot.zoneId}`}
-                        </div>
-                        {lot.location && (
-                          <div className="text-xs text-gray-500">
-                            Section {lot.location.section}, Row {lot.location.row}, Col {lot.location.column}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(lot.status)}`}>
+                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(lot.status)}`}>
                           {lot.status}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {lot.plantCount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {lot.currentYield ? `${lot.currentYield} kg` : 'Not harvested'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <Link
-                            href={`/plant-lots/${lot.id}`}
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            View
-                          </Link>
-                          {canManage && (
-                            <Link
-                              href={`/plant-lots/${lot.id}/edit`}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              Edit
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        {/* Location */}
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="h-4 w-4 text-gray-500" />
+                          <div className="text-sm">
+                            <span className="font-medium text-gray-900">
+                              {lot.zone?.name || `Zone ID: ${lot.zoneId}`}
+                            </span>
+                            {lot.location && (
+                              <div className="text-xs text-gray-500">
+                                Section {lot.location.section}, Row {lot.location.row}, Col {lot.location.column}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Plant Count & Yield */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-gray-50 rounded-2xl p-3">
+                            <div className="text-xs text-gray-500 mb-1">Plant Count</div>
+                            <div className="font-bold text-gray-900">{lot.plantCount}</div>
+                          </div>
+                          <div className="bg-gray-50 rounded-2xl p-3">
+                            <div className="text-xs text-gray-500 mb-1">Yield</div>
+                            <div className="font-bold text-gray-900">
+                              {lot.currentYield ? `${lot.currentYield} kg` : 'Not harvested'}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex space-x-2 pt-2">
+                          <Button asChild variant="outline" size="sm" className="flex-1 rounded-2xl border-2">
+                            <Link href={`/plant-lots/${lot.id}`}>
+                              <Eye className="mr-2 h-4 w-4" />
+                              View
                             </Link>
+                          </Button>
+                          {canManage && (
+                            <Button asChild variant="outline" size="sm" className="flex-1 rounded-2xl border-2">
+                              <Link href={`/plant-lots/${lot.id}/edit`}>
+                                <Edit3 className="mr-2 h-4 w-4" />
+                                Edit
+                              </Link>
+                            </Button>
                           )}
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                <div className="flex-1 flex justify-between sm:hidden">
-                  <button
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                    disabled={currentPage === totalPages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Page {currentPage} of {totalPages}
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            page === currentPage
-                              ? 'z-10 bg-green-50 border-green-500 text-green-600'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                    </nav>
-                  </div>
-                </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            )}
-          </div>
 
-          {plantLots.length === 0 && !loading && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No plant lots found with the current filters.</p>
-              {canManage && (
-                <Link
-                  href="/plant-lots/create"
-                  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                >
-                  Create Your First Plant Lot
-                </Link>
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <Card className="border-0 shadow-lg rounded-3xl bg-white">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-600">
+                        Page {currentPage} of {totalPages}
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                          disabled={currentPage === 1}
+                          variant="outline"
+                          size="sm"
+                          className="rounded-2xl"
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                          disabled={currentPage === totalPages}
+                          variant="outline"
+                          size="sm"
+                          className="rounded-2xl"
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </div>
+          ) : (
+            <Card className="border-0 shadow-xl rounded-3xl bg-white">
+              <CardContent className="p-12">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Leaf className="h-8 w-8 text-gray-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">No Plant Lots Found</h3>
+                  <p className="text-gray-600 mb-6">
+                    {currentPage === 1 && !selectedZone && !selectedSpecies && !selectedStatus
+                      ? "You haven't created any plant lots yet."
+                      : "No plant lots match the current filters."}
+                  </p>
+                  {canManage && currentPage === 1 && !selectedZone && !selectedSpecies && !selectedStatus && (
+                    <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl">
+                      <Link href="/plant-lots/create">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Your First Plant Lot
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </main>
