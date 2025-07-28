@@ -82,3 +82,12 @@ export const zonesApi = {
   getAll: (): Promise<Zone[]> =>
     apiClient.get('/zones'),
 };
+
+// Users API
+export const usersApi = {
+  getFieldStaff: (): Promise<User[]> =>
+    apiClient.get('/users/field-staff'),
+  
+  getAll: (): Promise<User[]> =>
+    apiClient.get('/users'),
+};

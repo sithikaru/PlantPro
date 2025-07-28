@@ -146,93 +146,43 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Actions */}
+                    {/* Quick Actions */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
                 Quick Actions
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {canManagePlants && (
+                <Link
+                  href="/plant-lots"
+                  className="bg-green-600 hover:bg-green-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
+                >
+                  View Plant Lots
+                </Link>
+                {(user.role === 'manager' || user.role === 'field_staff') && (
                   <>
                     <Link
-                      href="/plant-lots"
-                      className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg border border-gray-300 hover:border-green-500 transition-colors"
+                      href="/plant-lots/create"
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
                     >
-                      <div>
-                        <span className="rounded-lg inline-flex p-3 bg-green-50 text-green-700 ring-4 ring-white">
-                          <span className="text-xl">🌱</span>
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          Manage Plant Lots
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-500">
-                          View, create, and update plant lots
-                        </p>
-                      </div>
+                      Create Plant Lot
                     </Link>
-
                     <Link
                       href="/qr-scanner"
-                      className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg border border-gray-300 hover:border-green-500 transition-colors"
+                      className="bg-purple-600 hover:bg-purple-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
                     >
-                      <div>
-                        <span className="rounded-lg inline-flex p-3 bg-blue-50 text-blue-700 ring-4 ring-white">
-                          <span className="text-xl">📱</span>
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          QR Scanner
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-500">
-                          Scan QR codes to update plant data
-                        </p>
-                      </div>
+                      QR Scanner
                     </Link>
                   </>
                 )}
-
-                {canViewReports && (
+                {user.role === 'analytics' && (
                   <Link
                     href="/reports"
-                    className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg border border-gray-300 hover:border-green-500 transition-colors"
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
                   >
-                    <div>
-                      <span className="rounded-lg inline-flex p-3 bg-purple-50 text-purple-700 ring-4 ring-white">
-                        <span className="text-xl">📊</span>
-                      </span>
-                    </div>
-                    <div className="mt-4">
-                      <h3 className="text-lg font-medium text-gray-900">
-                        Reports & Analytics
-                      </h3>
-                      <p className="mt-2 text-sm text-gray-500">
-                        View plantation analytics and reports
-                      </p>
-                    </div>
+                    View Reports
                   </Link>
                 )}
-
-                <Link
-                  href="/profile"
-                  className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg border border-gray-300 hover:border-green-500 transition-colors"
-                >
-                  <div>
-                    <span className="rounded-lg inline-flex p-3 bg-gray-50 text-gray-700 ring-4 ring-white">
-                      <span className="text-xl">👤</span>
-                    </span>
-                  </div>
-                  <div className="mt-4">
-                    <h3 className="text-lg font-medium text-gray-900">
-                      Profile Settings
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-500">
-                      Manage your account settings
-                    </p>
-                  </div>
-                </Link>
               </div>
             </div>
           </div>
