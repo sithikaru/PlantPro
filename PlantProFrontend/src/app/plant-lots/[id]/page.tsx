@@ -23,7 +23,6 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
   const [plantLot, setPlantLot] = useState<PlantLot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -43,30 +42,18 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
       setError(null);
       const lot = await plantLotsApi.getById(lotId);
       setPlantLot(lot);
-      // Try to load QR code if it exists
-      if (lot && !lot.qrCode) {
-        try {
-          const qrCodeResponse = await plantLotsApi.getQrCode(lotId);
-          setPlantLot(prev => prev ? { ...prev, qrCode: qrCodeResponse.qrCode } : null);
-        } catch (qrErr) {
-          // QR code doesn't exist yet, that's fine
-          console.log('QR code not available yet');
-        }
+      
+      // Always try to get the QR code image for display
+      try {
+        const qrCodeResponse = await plantLotsApi.getQrCode(lotId);
+        setPlantLot(prev => prev ? { ...prev, qrCodeImage: qrCodeResponse.qrCode } : null);
+      } catch (qrErr) {
+        console.log('QR code image not available');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch plant lot');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const generateQRCode = async () => {
-    try {
-      const qrCodeResponse = await plantLotsApi.getQrCode(lotId);
-      setPlantLot(prev => prev ? { ...prev, qrCode: qrCodeResponse.qrCode } : null);
-      setShowQR(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate QR code');
     }
   };
 
