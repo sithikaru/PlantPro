@@ -39,9 +39,9 @@ import {
 } from "../../../components/ui/alert-dialog";
 
 interface UserDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function UserDetailsPage({ params }: UserDetailsPageProps) {
@@ -50,6 +50,15 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params;
+      setResolvedParams(resolved);
+    };
+    resolveParams();
+  }, [params]);
 
   useEffect(() => {
     if (!isAuthenticated || currentUser?.role !== 'manager') {
@@ -57,16 +66,18 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
       return;
     }
     
-    if (params.id) {
+    if (resolvedParams?.id) {
       fetchUser();
     }
-  }, [isAuthenticated, currentUser, params.id, router]);
+  }, [isAuthenticated, currentUser, resolvedParams, router]);
 
   const fetchUser = async () => {
+    if (!resolvedParams?.id) return;
+    
     try {
       setLoading(true);
       setError(null);
-      const response = await usersApi.getById(parseInt(params.id));
+      const response = await usersApi.getById(parseInt(resolvedParams.id));
       setUser(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch user');
@@ -186,16 +197,22 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Link href={`/users/${user.id}/edit`}>
+                <Link href={`/users/${resolvedParams?.id}/edit`}>
                   <Button variant="outline" className="rounded-xl">
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </Button>
                 </Link>
-                <Link href={`/users/${user.id}/change-password`}>
+                <Link href={`/users/${resolvedParams?.id}/change-password`}>
                   <Button variant="outline" className="rounded-xl">
                     <Key className="w-4 h-4 mr-2" />
                     Change Password
+                  </Button>
+                </Link>
+                <Link href={`/users/${resolvedParams?.id}/reset-password`}>
+                  <Button variant="outline" className="rounded-xl bg-red-50 border-red-200 text-red-600 hover:bg-red-100">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Reset Password
                   </Button>
                 </Link>
               </div>

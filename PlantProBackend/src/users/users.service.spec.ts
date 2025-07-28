@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UserRole } from '../common/enums/user-role.enum';
-import { CreateUserDto, UpdateUserDto, ChangePasswordDto } from './dto';
+import { CreateUserDto, UpdateUserDto, ChangePasswordDto, ResetPasswordDto } from './dto';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -253,6 +253,45 @@ describe('UsersService', () => {
         active: 2,
         inactive: 1,
       });
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should reset user password without current password verification', async () => {
+      const resetPasswordDto: ResetPasswordDto = {
+        newPassword: 'newPassword123',
+      };
+
+      const userWithoutPassword = {
+        id: 1,
+        email: 'test@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+      };
+
+      mockRepository.findOne.mockResolvedValue(userWithoutPassword);
+      jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedNewPassword' as never);
+
+      await service.resetPassword(1, resetPasswordDto);
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+        select: ['id', 'email', 'firstName', 'lastName'],
+      });
+      expect(bcrypt.hash).toHaveBeenCalledWith('newPassword123', 10);
+      expect(repository.update).toHaveBeenCalledWith(1, { password: 'hashedNewPassword' });
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      const resetPasswordDto: ResetPasswordDto = {
+        newPassword: 'newPassword123',
+      };
+
+      mockRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.resetPassword(999, resetPasswordDto)).rejects.toThrow(
+        new NotFoundException('User with ID 999 not found'),
+      );
     });
   });
 });

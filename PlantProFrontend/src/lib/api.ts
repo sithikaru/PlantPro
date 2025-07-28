@@ -17,6 +17,7 @@ import {
   CreateUserData,
   UpdateUserData,
   ChangePasswordData,
+  ResetPasswordData,
   UserStats
 } from './types';
 
@@ -112,6 +113,9 @@ export const usersApi = {
 
   changePassword: (id: number, data: ChangePasswordData): Promise<void> =>
     apiClient.patch(`/users/${id}/change-password`, data),
+
+  resetPassword: (id: number, data: ResetPasswordData): Promise<void> =>
+    apiClient.patch(`/users/${id}/reset-password`, data),
 
   toggleStatus: (id: number): Promise<User> =>
     apiClient.patch(`/users/${id}/toggle-status`),

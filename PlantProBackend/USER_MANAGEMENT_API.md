@@ -117,7 +117,7 @@ http://localhost:3001/api/users
 ### 9. Change User Password
 **PATCH** `/users/:id/change-password`
 - **Access**: Manager only
-- **Description**: Change a user's password
+- **Description**: Change a user's password (requires current password)
 
 **Request Body:**
 ```json
@@ -127,7 +127,27 @@ http://localhost:3001/api/users
 }
 ```
 
-### 10. Delete User
+### 10. Reset User Password (Manager Privilege)
+**PATCH** `/users/:id/reset-password`
+- **Access**: Manager only
+- **Description**: Reset a user's password without requiring current password
+- **Note**: Manager privilege - no current password verification needed
+
+**Request Body:**
+```json
+{
+  "newPassword": "newSecurePassword789"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Password reset successfully"
+}
+```
+
+### 11. Delete User
 **DELETE** `/users/:id`
 - **Access**: Manager only
 - **Description**: Delete a user account

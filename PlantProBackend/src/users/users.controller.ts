@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../common/enums/user-role.enum';
-import { CreateUserDto, UpdateUserDto, ChangePasswordDto, UserResponseDto } from './dto';
+import { CreateUserDto, UpdateUserDto, ChangePasswordDto, ResetPasswordDto, UserResponseDto } from './dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -113,6 +113,19 @@ export class UsersController {
     @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<void> {
     return this.usersService.changePassword(id, changePasswordDto);
+  }
+
+  @Patch(':id/reset-password')
+  @Roles(UserRole.MANAGER)
+  @ApiOperation({ summary: 'Reset user password without current password (Manager only)' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'Password reset successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  resetPassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<void> {
+    return this.usersService.resetPassword(id, resetPasswordDto);
   }
 
   @Delete(':id')

@@ -24,9 +24,9 @@ import {
 import Link from 'next/link';
 
 interface EditUserPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditUserPage({ params }: EditUserPageProps) {
@@ -36,6 +36,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
   const [formData, setFormData] = useState<UpdateUserData>({
     email: '',
     firstName: '',
@@ -45,21 +46,31 @@ export default function EditUserPage({ params }: EditUserPageProps) {
   });
 
   useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params;
+      setResolvedParams(resolved);
+    };
+    resolveParams();
+  }, [params]);
+
+  useEffect(() => {
     if (!isAuthenticated || currentUser?.role !== 'manager') {
       router.push('/dashboard');
       return;
     }
     
-    if (params.id) {
+    if (resolvedParams?.id) {
       fetchUser();
     }
-  }, [isAuthenticated, currentUser, params.id, router]);
+  }, [isAuthenticated, currentUser, resolvedParams, router]);
 
   const fetchUser = async () => {
+    if (!resolvedParams?.id) return;
+    
     try {
       setLoading(true);
       setError(null);
-      const response = await usersApi.getById(parseInt(params.id));
+      const response = await usersApi.getById(parseInt(resolvedParams.id));
       setUser(response);
       setFormData({
         email: response.email,
@@ -173,7 +184,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-4">
-              <Link href={`/users/${params.id}`}>
+              <Link href={`/users/${resolvedParams?.id}`}>
                 <Button variant="outline" size="sm" className="rounded-xl">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to User Details
@@ -341,7 +352,7 @@ export default function EditUserPage({ params }: EditUserPageProps) {
 
                 {/* Submit Button */}
                 <div className="flex gap-3 pt-4">
-                  <Link href={`/users/${params.id}`} className="flex-1">
+                  <Link href={`/users/${resolvedParams?.id}`} className="flex-1">
                     <Button
                       type="button"
                       variant="outline"

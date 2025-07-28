@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { UserRole } from '../common/enums/user-role.enum';
-import { CreateUserDto, UpdateUserDto, ChangePasswordDto, UserResponseDto } from './dto';
+import { CreateUserDto, UpdateUserDto, ChangePasswordDto, ResetPasswordDto, UserResponseDto } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -168,6 +168,24 @@ export class UsersService {
     // Hash new password
     const saltRounds = 10;
     const hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, saltRounds);
+
+    // Update password
+    await this.userRepository.update(id, { password: hashedNewPassword });
+  }
+
+  async resetPassword(id: number, resetPasswordDto: ResetPasswordDto): Promise<void> {
+    const user = await this.userRepository.findOne({ 
+      where: { id },
+      select: ['id', 'email', 'firstName', 'lastName']
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    // Hash new password (no current password verification needed for manager reset)
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(resetPasswordDto.newPassword, saltRounds);
 
     // Update password
     await this.userRepository.update(id, { password: hashedNewPassword });

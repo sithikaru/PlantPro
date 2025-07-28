@@ -226,6 +226,10 @@ export interface ChangePasswordData {
   newPassword: string;
 }
 
+export interface ResetPasswordData {
+  newPassword: string;
+}
+
 export interface UserStats {
   total: number;
   byRole: {

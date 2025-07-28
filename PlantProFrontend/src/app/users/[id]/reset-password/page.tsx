@@ -4,22 +4,22 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { usersApi } from '../../../../lib/api';
-import { User, ChangePasswordData } from '../../../../lib/types';
+import { User, ResetPasswordData } from '../../../../lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { Button } from '../../../../components/ui/button';
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import AppLayout from '../../../../components/AppLayout';
-import { ArrowLeft, Key, Shield, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Key, Shield, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
-interface ChangePasswordPageProps {
+interface ResetPasswordPageProps {
   params: Promise<{
     id: string;
   }>;
 }
 
-export default function ChangePasswordPage({ params }: ChangePasswordPageProps) {
+export default function ResetPasswordPage({ params }: ResetPasswordPageProps) {
   const { user: currentUser, isAuthenticated } = useAuth();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -28,11 +28,9 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
@@ -74,23 +72,18 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
+    if (!formData.newPassword || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('New passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
     if (formData.newPassword.length < 8) {
-      setError('New password must be at least 8 characters long');
-      return;
-    }
-
-    if (formData.currentPassword === formData.newPassword) {
-      setError('New password must be different from current password');
+      setError('Password must be at least 8 characters long');
       return;
     }
 
@@ -101,16 +94,14 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
       setError(null);
       setSuccess(false);
       
-      const changePasswordData: ChangePasswordData = {
-        currentPassword: formData.currentPassword,
+      const resetPasswordData: ResetPasswordData = {
         newPassword: formData.newPassword,
       };
 
-      await usersApi.changePassword(user.id, changePasswordData);
+      await usersApi.resetPassword(user.id, resetPasswordData);
       
       setSuccess(true);
       setFormData({
-        currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
@@ -120,7 +111,7 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
         router.push(`/users/${user.id}`);
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to change password');
+      setError(err instanceof Error ? err.message : 'Failed to reset password');
     } finally {
       setSaving(false);
     }
@@ -198,10 +189,10 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
               </Link>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-              Change Password
+              Reset Password
             </h1>
             <p className="text-gray-600 mt-1">
-              Update the password for {user?.firstName} {user?.lastName}
+              Set a new password for {user?.firstName} {user?.lastName}
             </p>
           </div>
 
@@ -210,10 +201,10 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
             <CardHeader>
               <CardTitle className="text-xl font-semibold flex items-center gap-2">
                 <Key className="w-5 h-5" />
-                Password Update
+                Manager Password Reset
               </CardTitle>
               <CardDescription>
-                Enter the current password and set a new secure password
+                Set a new password without requiring the current password
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -223,7 +214,7 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
                   <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-600">
                     <div className="flex items-center gap-2">
                       <Shield className="w-4 h-4" />
-                      Password updated successfully! Redirecting...
+                      Password reset successfully! Redirecting...
                     </div>
                   </div>
                 )}
@@ -235,32 +226,17 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
                   </div>
                 )}
 
-                {/* Current Password */}
-                <div>
-                  <Label htmlFor="currentPassword" className="text-sm font-medium">
-                    Current Password *
-                  </Label>
-                  <div className="relative mt-1">
-                    <Input
-                      id="currentPassword"
-                      type={showCurrentPassword ? "text" : "password"}
-                      value={formData.currentPassword}
-                      onChange={(e) => handleInputChange('currentPassword', e.target.value)}
-                      className="pr-10 rounded-xl"
-                      placeholder="Enter current password"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    >
-                      {showCurrentPassword ? (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      ) : (
-                        <Eye className="h-4 w-4 text-gray-400" />
-                      )}
-                    </button>
+                {/* Manager Privilege Notice */}
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-amber-900 mb-1">Manager Privilege</h4>
+                      <p className="text-sm text-amber-700">
+                        As a manager, you can reset any user&apos;s password without knowing their current password. 
+                        Use this feature responsibly and ensure the new password is communicated securely to the user.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -343,7 +319,18 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
                     <li>• Include uppercase and lowercase letters</li>
                     <li>• Include numbers and special characters</li>
                     <li>• Avoid using personal information</li>
-                    <li>• Don't reuse old passwords</li>
+                    <li>• Generate a secure random password</li>
+                  </ul>
+                </div>
+
+                {/* Security Notice */}
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                  <h4 className="font-medium text-gray-900 mb-2">Security Notice</h4>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• This action will be logged for security audit purposes</li>
+                    <li>• The user will need to use the new password for their next login</li>
+                    <li>• Consider informing the user about the password change</li>
+                    <li>• Recommend the user changes the password after first login</li>
                   </ul>
                 </div>
 
@@ -361,23 +348,23 @@ export default function ChangePasswordPage({ params }: ChangePasswordPageProps) 
                   </Link>
                   <Button
                     type="submit"
-                    className="flex-1 rounded-xl"
+                    className="flex-1 rounded-xl bg-red-600 hover:bg-red-700"
                     disabled={saving || success || formData.newPassword !== formData.confirmPassword}
                   >
                     {saving ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Updating...
+                        Resetting...
                       </>
                     ) : success ? (
                       <>
                         <Shield className="w-4 h-4 mr-2" />
-                        Password Updated
+                        Password Reset
                       </>
                     ) : (
                       <>
                         <Key className="w-4 h-4 mr-2" />
-                        Change Password
+                        Reset Password
                       </>
                     )}
                   </Button>

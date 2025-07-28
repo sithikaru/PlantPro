@@ -443,6 +443,12 @@ export default function UsersPage() {
                               Change Password
                             </Link>
                           </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/users/${userData.id}/reset-password`}>
+                              <Shield className="w-4 h-4 mr-2 text-red-600" />
+                              <span className="text-red-600">Reset Password</span>
+                            </Link>
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onClick={() => handleToggleStatus(userData.id)}
