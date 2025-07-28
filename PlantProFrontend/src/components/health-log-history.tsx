@@ -275,7 +275,7 @@ export default function HealthLogHistory({
                   <div className="flex items-center space-x-2 text-sm text-gray-500">
                     <MapPin className="h-4 w-4" />
                     <span>
-                      Location: {log.latitude.toFixed(6)}, {log.longitude.toFixed(6)}
+                      Location: {Number(log.latitude).toFixed(6)}, {Number(log.longitude).toFixed(6)}
                     </span>
                   </div>
                 )}

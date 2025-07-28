@@ -65,10 +65,28 @@ export class HealthLog {
   @Column({ type: 'text', nullable: true })
   aiRawResponse?: string | null; // Store raw AI service response for debugging
 
-  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  @Column({ 
+    type: 'decimal', 
+    precision: 10, 
+    scale: 6, 
+    nullable: true,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => value ? parseFloat(value) : null,
+    }
+  })
   latitude: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  @Column({ 
+    type: 'decimal', 
+    precision: 10, 
+    scale: 6, 
+    nullable: true,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => value ? parseFloat(value) : null,
+    }
+  })
   longitude: number;
 
   @Column({ type: 'datetime', nullable: true })
