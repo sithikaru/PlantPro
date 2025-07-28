@@ -14,6 +14,7 @@ import { HealthLogsModule } from './health-logs/health-logs.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     SeedModule,
     HealthLogsModule,
     DashboardModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [
