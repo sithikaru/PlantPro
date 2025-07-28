@@ -8,6 +8,7 @@ import { getDatabaseConfig } from './config/database.config';
 import { AuthModule } from './auth/auth.module';
 import { PlantsModule } from './plants/plants.module';
 import { ZonesModule } from './zones/zones.module';
+import { UsersModule } from './users/users.module';
 import { SeedModule } from './database/seed.module';
 import { HealthLogsModule } from './health-logs/health-logs.module';
 import { DashboardModule } from './dashboard/dashboard.module';
@@ -28,6 +29,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     AuthModule,
     PlantsModule,
     ZonesModule,
+    UsersModule,
     SeedModule,
     HealthLogsModule,
     DashboardModule,

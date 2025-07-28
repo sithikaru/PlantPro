@@ -38,15 +38,22 @@ export class PlantLotsController {
   @Get()
   @Roles(UserRole.MANAGER, UserRole.FIELD_STAFF, UserRole.ANALYTICS)
   async findAll(
-    @Query('page', ParseIntPipe) page: number = 1,
-    @Query('limit', ParseIntPipe) limit: number = 10,
-    @Query('zoneId') zoneId?: number,
-    @Query('speciesId') speciesId?: number,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('zoneId') zoneId?: string,
+    @Query('speciesId') speciesId?: string,
     @Query('status') status?: string,
-    @Query('assignedToId') assignedToId?: number,
+    @Query('assignedToId') assignedToId?: string,
   ) {
-    const filters = { zoneId, speciesId, status, assignedToId };
-    return this.plantLotsService.findAll(page, limit, filters);
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    const filters = { 
+      zoneId: zoneId ? parseInt(zoneId, 10) : undefined,
+      speciesId: speciesId ? parseInt(speciesId, 10) : undefined,
+      status,
+      assignedToId: assignedToId ? parseInt(assignedToId, 10) : undefined,
+    };
+    return this.plantLotsService.findAll(pageNum, limitNum, filters);
   }
 
   @Get(':id')
