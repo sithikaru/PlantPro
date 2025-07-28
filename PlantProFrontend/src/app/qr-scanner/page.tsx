@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { plantLotsApi } from '../../lib/api';
 import { PlantLot } from '../../lib/types';
+import jsQR from 'jsqr';
 
 export default function QRScannerPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -32,6 +33,23 @@ export default function QRScannerPage() {
       }
     };
   }, [stream]);
+
+  // Continuous scanning effect
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+    
+    if (scanning && !plantLot) {
+      intervalId = setInterval(() => {
+        captureFrame();
+      }, 100); // Check for QR codes every 100ms
+    }
+    
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [scanning, plantLot]);
 
   const startCamera = async () => {
     try {
@@ -73,19 +91,13 @@ export default function QRScannerPage() {
     canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0);
 
-    // In a real implementation, you would use a QR code library here
-    // For now, we'll simulate QR code detection
-    // const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    // Use jsQR to detect QR codes in the frame
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imageData.data, imageData.width, imageData.height);
     
-    // This is a placeholder - in reality you'd use a library like jsQR
-    // const code = jsQR(imageData.data, imageData.width, imageData.height);
-    
-    // For demo purposes, we'll simulate finding a QR code after a few captures
-    setTimeout(() => {
-      // Simulate QR code detection
-      const simulatedQRCode = 'PLT-' + Math.random().toString(36).substr(2, 9);
-      handleQRCodeDetected(simulatedQRCode);
-    }, 2000);
+    if (code) {
+      handleQRCodeDetected(code.data);
+    }
   };
 
   const handleQRCodeDetected = async (qrCode: string) => {
