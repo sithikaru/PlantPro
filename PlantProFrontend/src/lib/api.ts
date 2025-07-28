@@ -10,7 +10,10 @@ import {
   QrScanUpdateData,
   PaginatedResponse,
   PlantSpecies,
-  Zone
+  Zone,
+  HealthLog,
+  CreateHealthLogData,
+  UpdateHealthLogData
 } from './types';
 
 // Auth API
@@ -90,4 +93,33 @@ export const usersApi = {
   
   getAll: (): Promise<User[]> =>
     apiClient.get('/users'),
+};
+
+// Health Logs API
+export const healthLogsApi = {
+  getAll: (plantLotId?: number): Promise<HealthLog[]> => {
+    const params = plantLotId ? `?plantLotId=${plantLotId}` : '';
+    return apiClient.get(`/health-logs${params}`);
+  },
+
+  getById: (id: number): Promise<HealthLog> =>
+    apiClient.get(`/health-logs/${id}`),
+
+  create: (data: CreateHealthLogData): Promise<HealthLog> =>
+    apiClient.post('/health-logs', data),
+
+  createWithImages: (data: FormData): Promise<HealthLog> =>
+    apiClient.post('/health-logs/upload', data),
+
+  update: (id: number, data: UpdateHealthLogData): Promise<HealthLog> =>
+    apiClient.patch(`/health-logs/${id}`, data),
+
+  delete: (id: number): Promise<void> =>
+    apiClient.delete(`/health-logs/${id}`),
+
+  retryAnalysis: (id: number): Promise<HealthLog> =>
+    apiClient.post(`/health-logs/${id}/retry-analysis`),
+
+  getAnalytics: (plantLotId: number): Promise<Record<string, unknown>> =>
+    apiClient.get(`/health-logs/analytics/${plantLotId}`),
 };

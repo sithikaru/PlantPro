@@ -158,6 +158,12 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Button asChild variant="outline">
+                <Link href={`/plant-lots/${plantLot.id}/health-log`}>
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  Health Logs
+                </Link>
+              </Button>
               {canManage && (
                 <>
                   <Button asChild variant="outline">

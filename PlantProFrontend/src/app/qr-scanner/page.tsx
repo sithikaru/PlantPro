@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { plantLotsApi } from '../../lib/api';
 import { PlantLot } from '../../lib/types';
 import jsQR from 'jsqr';
+import HealthReportForm from '../../components/health-report-form';
+import HealthLogHistory from '../../components/health-log-history';
 
 export default function QRScannerPage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -19,6 +21,8 @@ export default function QRScannerPage() {
   const [plantLot, setPlantLot] = useState<PlantLot | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [cameraSupported, setCameraSupported] = useState(true);
+  const [showHealthForm, setShowHealthForm] = useState(false);
+  const [refreshHistory, setRefreshHistory] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -156,6 +160,13 @@ export default function QRScannerPage() {
     setScannedCode(null);
     setPlantLot(null);
     setError(null);
+    setShowHealthForm(false);
+    setRefreshHistory(false);
+  };
+
+  const handleHealthReportSuccess = () => {
+    setShowHealthForm(false);
+    setRefreshHistory(true);
   };
 
   if (authLoading) {
@@ -326,81 +337,95 @@ export default function QRScannerPage() {
               </div>
             </div>
           ) : (
-            /* Plant Lot Details */
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                      Plant Lot Found
-                    </h3>
-                    <p className="text-sm text-gray-500">QR Code: {scannedCode}</p>
+            /* Plant Lot Details with Health Report */
+            <div className="space-y-6">
+              <div className="bg-white shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">
+                        Plant Lot Found
+                      </h3>
+                      <p className="text-sm text-gray-500">QR Code: {scannedCode}</p>
+                    </div>
+                    <button
+                      onClick={resetScanner}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    >
+                      Scan Another
+                    </button>
                   </div>
-                  <button
-                    onClick={resetScanner}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    Scan Another
-                  </button>
-                </div>
 
-                <div className="border rounded-lg p-4">
-                  <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Lot Number</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{plantLot.lotNumber}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Status</dt>
-                      <dd className="mt-1">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${{
-                          'seedling': 'bg-yellow-100 text-yellow-800',
-                          'growing': 'bg-green-100 text-green-800',
-                          'mature': 'bg-blue-100 text-blue-800',
-                          'harvesting': 'bg-purple-100 text-purple-800',
-                          'harvested': 'bg-gray-100 text-gray-800',
-                          'diseased': 'bg-red-100 text-red-800',
-                          'dead': 'bg-black text-white',
-                        }[plantLot.status] || 'bg-gray-100 text-gray-800'}`}>
-                          {plantLot.status}
-                        </span>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Species</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {plantLot.species?.name || `Species ID: ${plantLot.speciesId}`}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Zone</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {plantLot.zone?.name || `Zone ID: ${plantLot.zoneId}`}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Plant Count</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{plantLot.plantCount}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">Planted Date</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {new Date(plantLot.plantedDate).toLocaleDateString()}
-                      </dd>
-                    </div>
-                  </dl>
+                  <div className="border rounded-lg p-4 mb-6">
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Lot Number</dt>
+                        <dd className="mt-1 text-sm text-gray-900">{plantLot.lotNumber}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Status</dt>
+                        <dd className="mt-1">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${{
+                            'seedling': 'bg-yellow-100 text-yellow-800',
+                            'growing': 'bg-green-100 text-green-800',
+                            'mature': 'bg-blue-100 text-blue-800',
+                            'harvesting': 'bg-purple-100 text-purple-800',
+                            'harvested': 'bg-gray-100 text-gray-800',
+                            'diseased': 'bg-red-100 text-red-800',
+                            'dead': 'bg-black text-white',
+                          }[plantLot.status] || 'bg-gray-100 text-gray-800'}`}>
+                            {plantLot.status}
+                          </span>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Species</dt>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          {plantLot.species?.name || `Species ID: ${plantLot.speciesId}`}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Zone</dt>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          {plantLot.zone?.name || `Zone ID: ${plantLot.zoneId}`}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Plant Count</dt>
+                        <dd className="mt-1 text-sm text-gray-900">{plantLot.plantCount}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Planted Date</dt>
+                        <dd className="mt-1 text-sm text-gray-900">
+                          {new Date(plantLot.plantedDate).toLocaleDateString()}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
 
-                  <div className="mt-6 flex space-x-4">
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-4 mb-6">
+                    {(user.role === 'manager' || user.role === 'field_staff') && (
+                      <button
+                        onClick={() => setShowHealthForm(true)}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Health Report
+                      </button>
+                    )}
                     <Link
                       href={`/plant-lots/${plantLot.id}`}
-                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                     >
-                      View Details
+                      View Full Details
                     </Link>
                     {(user.role === 'manager' || user.role === 'field_staff') && (
                       <Link
                         href={`/plant-lots/${plantLot.id}/edit`}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                       >
                         Edit Plant Lot
                       </Link>
@@ -408,7 +433,24 @@ export default function QRScannerPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Health Log History */}
+              <HealthLogHistory 
+                plantLotId={plantLot.id} 
+                refresh={refreshHistory}
+                onRefreshComplete={() => setRefreshHistory(false)}
+              />
             </div>
+          )}
+
+          {/* Health Report Form Modal */}
+          {showHealthForm && plantLot && (
+            <HealthReportForm
+              plantLotId={plantLot.id}
+              plantLotNumber={plantLot.lotNumber}
+              onSuccess={handleHealthReportSuccess}
+              onCancel={() => setShowHealthForm(false)}
+            />
           )}
         </div>
       </main>

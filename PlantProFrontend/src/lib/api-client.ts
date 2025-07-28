@@ -8,10 +8,13 @@ class ApiClient {
     this.baseURL = baseURL;
   }
 
-  private getHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
+  private getHeaders(isFormData: boolean = false): Record<string, string> {
+    const headers: Record<string, string> = {};
+
+    // Only set Content-Type for non-FormData requests
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     // Add auth token if available
     if (typeof window !== 'undefined') {

@@ -79,6 +79,77 @@ export interface PlantLot {
   species?: PlantSpecies;
   zone?: Zone;
   assignedTo?: User;
+  healthLogs?: HealthLog[];
+}
+
+// Health Log types
+export type HealthStatus = 'excellent' | 'good' | 'fair' | 'poor' | 'diseased' | 'critical';
+
+export type AnalysisStatus = 'pending' | 'processing' | 'completed' | 'failed';
+
+export interface HealthMetrics {
+  plantHeight?: number;
+  leafCount?: number;
+  flowerCount?: number;
+  fruitCount?: number;
+  temperature?: number;
+  humidity?: number;
+  soilMoisture?: number;
+}
+
+export interface AIAnalysis {
+  healthScore?: number;
+  diseaseDetected?: boolean;
+  diseaseType?: string;
+  confidence?: number;
+  recommendations?: string[];
+  detectedIssues?: {
+    type: string;
+    severity: string;
+    confidence: number;
+    location?: { x: number; y: number; width: number; height: number };
+  }[];
+}
+
+export interface HealthLog {
+  id: number;
+  healthStatus: HealthStatus;
+  notes?: string;
+  images?: string[];
+  metrics?: HealthMetrics;
+  analysisStatus: AnalysisStatus;
+  aiAnalysis?: AIAnalysis;
+  aiRawResponse?: string;
+  latitude?: number;
+  longitude?: number;
+  recordedAt?: string;
+  plantLotId: number;
+  recordedById: number;
+  createdAt: string;
+  updatedAt: string;
+  plantLot?: PlantLot;
+  recordedBy?: User;
+}
+
+export interface CreateHealthLogData {
+  healthStatus: HealthStatus;
+  notes?: string;
+  images?: string[];
+  metrics?: HealthMetrics;
+  latitude?: number;
+  longitude?: number;
+  recordedAt?: string;
+  plantLotId: number;
+}
+
+export interface UpdateHealthLogData {
+  healthStatus?: HealthStatus;
+  notes?: string;
+  images?: string[];
+  metrics?: HealthMetrics;
+  latitude?: number;
+  longitude?: number;
+  recordedAt?: string;
 }
 
 export interface CreatePlantLotData {
