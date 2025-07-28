@@ -177,7 +177,9 @@ export class PlantLotsService {
   async generateQRCodeImage(id: number): Promise<string> {
     const plantLot = await this.findOne(id);
     
+    // Use the stored QR code as the primary identifier
     const qrData = {
+      qrCode: plantLot.qrCode,  // This is the unique identifier for lookup
       lotId: plantLot.id,
       lotNumber: plantLot.lotNumber,
       species: plantLot.species.name,
@@ -232,8 +234,11 @@ export class PlantLotsService {
 
   private async generateQRCode(lotNumber: string): Promise<string> {
     try {
-      // Generate a simple QR code string for database storage
-      return `PLT-${lotNumber}`;
+      // Generate a unique QR code string for database storage
+      // Use lot number + timestamp + random component for uniqueness
+      const timestamp = Date.now().toString();
+      const randomComponent = Math.random().toString(36).substring(2, 8);
+      return `PLT-${lotNumber}-${timestamp}-${randomComponent}`.toUpperCase();
     } catch (error) {
       throw new BadRequestException('Failed to generate QR code');
     }

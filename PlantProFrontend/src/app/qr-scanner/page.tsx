@@ -96,8 +96,22 @@ export default function QRScannerPage() {
       // Try to parse the QR code as JSON first (new format)
       try {
         const qrData = JSON.parse(qrCode);
+        
+        // First try to use the stored QR code for lookup (most reliable)
+        if (qrData.qrCode) {
+          try {
+            const lot = await plantLotsApi.getByQrCode(qrData.qrCode);
+            setPlantLot(lot);
+            stopCamera();
+            return;
+          } catch (qrCodeError) {
+            // If QR code lookup fails, fall back to lot ID
+            console.log('QR code lookup failed, trying lot ID');
+          }
+        }
+        
+        // Fallback to lot ID if QR code lookup failed
         if (qrData.lotId) {
-          // New format: QR code contains JSON with lotId
           const lot = await plantLotsApi.getById(qrData.lotId);
           setPlantLot(lot);
           stopCamera();
