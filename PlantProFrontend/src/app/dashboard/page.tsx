@@ -4,6 +4,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -33,13 +36,13 @@ export default function DashboardPage() {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'manager':
-        return 'bg-purple-100 text-purple-800';
+        return 'default';
       case 'field_staff':
-        return 'bg-green-100 text-green-800';
+        return 'secondary';
       case 'analytics':
-        return 'bg-blue-100 text-blue-800';
+        return 'outline';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'default';
     }
   };
 
@@ -47,27 +50,28 @@ export default function DashboardPage() {
   const canViewReports = true; // All roles can view reports
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow">
+      <header className="bg-card shadow border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">PlantPro Dashboard</h1>
+              <h1 className="text-xl font-semibold text-foreground">PlantPro Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-muted-foreground">
                 Welcome, {user.firstName} {user.lastName}
               </span>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
+              <Badge variant={getRoleColor(user.role)}>
                 {user.role.replace('_', ' ').toUpperCase()}
-              </span>
-              <button
+              </Badge>
+              <Button
                 onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+                variant="destructive"
+                size="sm"
               >
                 Logout
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -78,127 +82,122 @@ export default function DashboardPage() {
         <div className="px-4 py-6 sm:px-0">
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-600 rounded-md flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">🌱</span>
+                    <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                      <span className="text-primary-foreground text-sm font-bold">🌱</span>
                     </div>
                   </div>
                   <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground truncate">
                         Active Plant Lots
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
+                      </div>
+                      <div className="text-lg font-medium text-foreground">
                         Loading...
-                      </dd>
-                    </dl>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">📍</span>
+                    <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                      <span className="text-primary-foreground text-sm font-bold">📍</span>
                     </div>
                   </div>
                   <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground truncate">
                         Active Zones
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
+                      </div>
+                      <div className="text-lg font-medium text-foreground">
                         Loading...
-                      </dd>
-                    </dl>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-yellow-600 rounded-md flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">🌾</span>
+                    <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                      <span className="text-primary-foreground text-sm font-bold">🌾</span>
                     </div>
                   </div>
                   <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground truncate">
                         Ready for Harvest
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
+                      </div>
+                      <div className="text-lg font-medium text-foreground">
                         Loading...
-                      </dd>
-                    </dl>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Quick Actions */}
-                    {/* Quick Actions */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Quick Actions
-              </h3>
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Link
-                  href="/plant-lots"
-                  className="bg-green-600 hover:bg-green-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
-                >
-                  View Plant Lots
-                </Link>
+                <Button asChild>
+                  <Link href="/plant-lots">
+                    View Plant Lots
+                  </Link>
+                </Button>
                 {(user.role === 'manager' || user.role === 'field_staff') && (
                   <>
-                    <Link
-                      href="/plant-lots/create"
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
-                    >
-                      Create Plant Lot
-                    </Link>
-                    <Link
-                      href="/qr-scanner"
-                      className="bg-purple-600 hover:bg-purple-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
-                    >
-                      QR Scanner
-                    </Link>
+                    <Button asChild variant="secondary">
+                      <Link href="/plant-lots/create">
+                        Create Plant Lot
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline">
+                      <Link href="/qr-scanner">
+                        QR Scanner
+                      </Link>
+                    </Button>
                   </>
                 )}
                 {user.role === 'analytics' && (
-                  <Link
-                    href="/reports"
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white text-center px-4 py-3 rounded-md text-sm font-medium block"
-                  >
-                    View Reports
-                  </Link>
+                  <Button asChild variant="secondary">
+                    <Link href="/reports">
+                      View Reports
+                    </Link>
+                  </Button>
                 )}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Recent Activity */}
-          <div className="mt-8 bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Recent Activity
-              </h3>
-              <div className="text-center py-8 text-gray-500">
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
                 <p>Activity feed will be displayed here</p>
                 <p className="text-sm">Coming soon...</p>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>
