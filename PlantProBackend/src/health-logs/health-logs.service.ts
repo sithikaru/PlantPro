@@ -41,11 +41,16 @@ export class HealthLogsService {
     userId: number
   ): Promise<HealthLog> {
     try {
-      // Validate and upload images
-      this.imageUploadService.validateMultipleImageFiles(files);
-      const imageUrls = await this.imageUploadService.uploadMultipleImages(files);
+      let imageUrls: string[] = [];
 
-      // Create health log with uploaded image URLs
+      // Only process images if files are provided
+      if (files && files.length > 0) {
+        // Validate and upload images
+        this.imageUploadService.validateMultipleImageFiles(files);
+        imageUrls = await this.imageUploadService.uploadMultipleImages(files);
+      }
+
+      // Create health log with uploaded image URLs (or empty array)
       const healthLogData = {
         ...createHealthLogDto,
         images: imageUrls,

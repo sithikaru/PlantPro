@@ -37,7 +37,12 @@ export class HealthLogsController {
     @Body() createHealthLogDto: CreateHealthLogDto,
     @GetUser() user: User,
   ) {
-    return this.healthLogsService.create(createHealthLogDto, user.id);
+    try {
+      return this.healthLogsService.create(createHealthLogDto, user.id);
+    } catch (error) {
+      console.error('Error in create health log:', error);
+      throw error;
+    }
   }
 
   @Post('upload')
@@ -46,11 +51,46 @@ export class HealthLogsController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Create health log with image uploads' })
   createWithImages(
-    @Body() createHealthLogDto: CreateHealthLogDto,
+    @Body() rawData: any,
     @UploadedFiles() files: Express.Multer.File[],
     @GetUser() user: User,
   ) {
-    return this.healthLogsService.createWithImages(createHealthLogDto, files, user.id);
+    try {
+      console.log('Received upload request:', {
+        rawData,
+        filesCount: files?.length || 0,
+        userId: user.id
+      });
+
+      // Parse the FormData properly
+      const createHealthLogDto: CreateHealthLogDto = {
+        plantLotId: parseInt(rawData.plantLotId, 10),
+        healthStatus: rawData.healthStatus,
+        notes: rawData.notes || '',
+        recordedAt: rawData.recordedAt,
+        latitude: rawData.latitude ? parseFloat(rawData.latitude) : undefined,
+        longitude: rawData.longitude ? parseFloat(rawData.longitude) : undefined,
+        metrics: undefined,
+      };
+
+      // Safely parse metrics if provided
+      if (rawData.metrics && rawData.metrics.trim() !== '' && rawData.metrics !== 'undefined') {
+        try {
+          createHealthLogDto.metrics = JSON.parse(rawData.metrics);
+        } catch (parseError) {
+          console.log('Failed to parse metrics:', rawData.metrics, parseError);
+          // Continue without metrics rather than failing
+        }
+      }
+
+      console.log('Parsed DTO:', createHealthLogDto);
+
+      return this.healthLogsService.createWithImages(createHealthLogDto, files || [], user.id);
+    } catch (error) {
+      console.error('Error in createWithImages:', error);
+      console.error('Error stack:', error.stack);
+      throw error;
+    }
   }
 
   @Get()

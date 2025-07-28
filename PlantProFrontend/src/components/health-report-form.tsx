@@ -113,34 +113,74 @@ export default function HealthReportForm({
     setError(null);
 
     try {
+      console.log('Submitting health report with data:', formData);
+      console.log('Selected images:', selectedImages);
+
       if (selectedImages.length > 0) {
         // Create FormData for images
         const formDataWithImages = new FormData();
         formDataWithImages.append('plantLotId', plantLotId.toString());
         formDataWithImages.append('healthStatus', formData.healthStatus);
-        if (formData.notes) formDataWithImages.append('notes', formData.notes);
-        if (formData.recordedAt) formDataWithImages.append('recordedAt', formData.recordedAt);
-        if (formData.latitude) formDataWithImages.append('latitude', formData.latitude.toString());
-        if (formData.longitude) formDataWithImages.append('longitude', formData.longitude.toString());
+        if (formData.notes && formData.notes.trim()) {
+          formDataWithImages.append('notes', formData.notes);
+        }
+        if (formData.recordedAt) {
+          formDataWithImages.append('recordedAt', formData.recordedAt);
+        }
+        if (formData.latitude) {
+          formDataWithImages.append('latitude', formData.latitude.toString());
+        }
+        if (formData.longitude) {
+          formDataWithImages.append('longitude', formData.longitude.toString());
+        }
         
-        // Add metrics
-        if (formData.metrics) {
-          formDataWithImages.append('metrics', JSON.stringify(formData.metrics));
+        // Add metrics only if there are actual values
+        if (formData.metrics && Object.keys(formData.metrics).length > 0) {
+          // Filter out undefined/null values
+          const cleanMetrics = Object.fromEntries(
+            Object.entries(formData.metrics).filter(([_, value]) => value !== undefined && value !== null)
+          );
+          if (Object.keys(cleanMetrics).length > 0) {
+            formDataWithImages.append('metrics', JSON.stringify(cleanMetrics));
+          }
         }
         
         // Add images
-        selectedImages.forEach((image, index) => {
+        selectedImages.forEach((image) => {
           formDataWithImages.append('images', image);
         });
 
+        console.log('Calling createWithImages API...');
         await healthLogsApi.createWithImages(formDataWithImages);
       } else {
-        // Create without images
-        await healthLogsApi.create(formData);
+        // Create without images using regular JSON endpoint
+        console.log('Calling create API without images...');
+        
+        // Clean the form data to remove undefined values
+        const cleanFormData = {
+          ...formData,
+          notes: formData.notes?.trim() || undefined,
+          metrics: formData.metrics && Object.keys(formData.metrics).length > 0 
+            ? Object.fromEntries(
+                Object.entries(formData.metrics).filter(([_, value]) => value !== undefined && value !== null)
+              )
+            : undefined
+        };
+        
+        // Remove undefined fields
+        Object.keys(cleanFormData).forEach(key => {
+          if (cleanFormData[key as keyof typeof cleanFormData] === undefined) {
+            delete cleanFormData[key as keyof typeof cleanFormData];
+          }
+        });
+
+        await healthLogsApi.create(cleanFormData);
       }
 
+      console.log('Health report saved successfully');
       onSuccess();
     } catch (err) {
+      console.error('Error saving health report:', err);
       setError(err instanceof Error ? err.message : 'Failed to save health report');
     } finally {
       setLoading(false);

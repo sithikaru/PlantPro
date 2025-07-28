@@ -29,23 +29,39 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    isFormData: boolean = false
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
     const config: RequestInit = {
       ...options,
       headers: {
-        ...this.getHeaders(),
+        ...this.getHeaders(isFormData),
         ...options.headers,
       },
     };
 
+    console.log('API Request:', {
+      url,
+      method: config.method || 'GET',
+      headers: config.headers,
+      isFormData,
+      bodyType: config.body ? config.body.constructor.name : 'none'
+    });
+
     try {
       const response = await fetch(url, config);
       
+      console.log('API Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('API Error Response:', errorData);
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
@@ -61,17 +77,19 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
+    const isFormData = data instanceof FormData;
     return this.request<T>(endpoint, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+      body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
+    }, isFormData);
   }
 
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {
+    const isFormData = data instanceof FormData;
     return this.request<T>(endpoint, {
       method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+      body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
+    }, isFormData);
   }
 
   async delete<T>(endpoint: string): Promise<T> {
