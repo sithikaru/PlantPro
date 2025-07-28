@@ -202,11 +202,11 @@ export class DashboardService {
             id: plantLot.assignedTo.id,
             firstName: plantLot.assignedTo.firstName,
             lastName: plantLot.assignedTo.lastName,
-          } : null,
+          } : undefined,
           zone: plantLot.zone ? {
             id: plantLot.zone.id,
             name: plantLot.zone.name,
-          } : null,
+          } : undefined,
         };
       });
 

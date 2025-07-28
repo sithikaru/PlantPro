@@ -10,6 +10,7 @@ import { PlantsModule } from './plants/plants.module';
 import { ZonesModule } from './zones/zones.module';
 import { SeedModule } from './database/seed.module';
 import { HealthLogsModule } from './health-logs/health-logs.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 
@@ -29,6 +30,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     ZonesModule,
     SeedModule,
     HealthLogsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
