@@ -166,10 +166,6 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                       Edit
                     </Link>
                   </Button>
-                  <Button onClick={generateQRCode} className="bg-green-600 hover:bg-green-700">
-                    <QrCode className="mr-2 h-4 w-4" />
-                    Generate QR Code
-                  </Button>
                 </>
               )}
             </div>
@@ -343,16 +339,7 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                     </div>
                   ) : (
                     <div className="text-center">
-                      <p className="text-gray-500 mb-4">No QR code generated</p>
-                      {canManage && (
-                        <Button
-                          onClick={generateQRCode}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <QrCode className="mr-2 h-4 w-4" />
-                          Generate QR Code
-                        </Button>
-                      )}
+                      <p className="text-gray-500">QR code will be available once generated</p>
                     </div>
                   )}
                 </CardContent>
