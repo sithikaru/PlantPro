@@ -10,13 +10,10 @@ import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import AppLayout from '../../components/AppLayout';
 import { 
-  ArrowLeft, 
-  Leaf, 
   Plus,
   Activity,
-  BarChart3,
-  Scan,
   Edit3,
   Eye,
   MapPin,
@@ -123,67 +120,42 @@ export default function PlantLotsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-6">
-              <Button asChild variant="ghost" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full px-4">
-                <Link href="/dashboard">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Dashboard
-                </Link>
-              </Button>
-              <div className="h-6 w-px bg-gray-200"></div>
-              <h1 className="text-2xl font-bold text-gray-900 font-['Inter'] tracking-tight">
-                Plant Lots
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              {canManage && (
-                <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Link href="/plant-lots/create">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create New Plant Lot
-                  </Link>
-                </Button>
-              )}
+    <AppLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              <div className="flex items-center space-x-6">
+                <h1 className="text-2xl font-bold text-gray-900 font-['Inter'] tracking-tight">
+                  Plant Lots
+                </h1>
+              </div>
+              <div className="flex items-center space-x-4">
+                {canManage && (
+                  <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
+                    <Link href="/plant-lots/create">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create New Plant Lot
+                    </Link>
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Sidebar Navigation */}
-      <div className="fixed left-6 top-1/2 transform -translate-y-1/2 z-10 hidden lg:block">
-        <div className="flex flex-col space-y-4">
-          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Link href="/dashboard">
-              <BarChart3 className="h-5 w-5 text-gray-600" />
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Link href="/qr-scanner">
-              <Scan className="h-5 w-5 text-gray-600" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-green-50 w-12 h-12">
-            <Leaf className="h-5 w-5 text-green-600" />
-          </Button>
-        </div>
-      </div>
-
-      <main className="max-w-7xl mx-auto py-12 px-6 lg:px-8">
-        <div className="space-y-8">
-          {/* Page Header */}
-          <div className="text-center">
-            <h2 className="text-4xl font-bold text-gray-900 mb-3 font-['Inter'] tracking-tight">
-              Plant Lot Management
-            </h2>
-            <p className="text-xl text-gray-600 font-light leading-relaxed">
-              Monitor and manage all plant lots across your plantation
-            </p>
-          </div>
+        <main className="max-w-7xl mx-auto py-12 px-6 lg:px-8">
+          <div className="space-y-8">
+            {/* Page Header */}
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-gray-900 mb-3 font-['Inter'] tracking-tight">
+                Plant Lot Management
+              </h2>
+              <p className="text-xl text-gray-600 font-light leading-relaxed">
+                Monitor and manage all plant lots across your plantation
+              </p>
+            </div>
 
           {/* Filters Card */}
           <Card className="border-0 shadow-xl rounded-3xl bg-white">
@@ -393,7 +365,7 @@ export default function PlantLotsPage() {
               <CardContent className="p-12">
                 <div className="text-center">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Leaf className="h-8 w-8 text-gray-600" />
+                    <Plus className="h-8 w-8 text-gray-600" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">No Plant Lots Found</h3>
                   <p className="text-gray-600 mb-6">
@@ -415,6 +387,7 @@ export default function PlantLotsPage() {
           )}
         </div>
       </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

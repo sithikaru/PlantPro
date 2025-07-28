@@ -9,24 +9,21 @@ import { PlantLot } from '../../lib/types';
 import jsQR from 'jsqr';
 import HealthReportForm from '../../components/health-report-form';
 import HealthLogHistory from '../../components/health-log-history';
+import AppLayout from '../../components/AppLayout';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { 
-  ArrowLeft, 
   Camera, 
   CameraOff, 
   Scan, 
   Leaf, 
   Activity, 
-  History, 
   Plus, 
-  X,
-  BarChart3,
-  Edit3,
   Search,
   Eye,
+  Edit3,
   RefreshCw
 } from 'lucide-react';
 
@@ -209,66 +206,41 @@ export default function QRScannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-6">
-              <Button asChild variant="ghost" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full px-4">
-                <Link href="/plant-lots">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Plant Lots
-                </Link>
-              </Button>
-              <div className="h-6 w-px bg-gray-200"></div>
-              <h1 className="text-2xl font-bold text-gray-900 font-['Inter'] tracking-tight">
-                QR Scanner
-              </h1>
+    <AppLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              <div className="flex items-center space-x-6">
+                <h1 className="text-2xl font-bold text-gray-900 font-['Inter'] tracking-tight">
+                  QR Scanner
+                </h1>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Sidebar Navigation */}
-      <div className="fixed left-6 top-1/2 transform -translate-y-1/2 z-10 hidden lg:block">
-        <div className="flex flex-col space-y-4">
-          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Link href="/dashboard">
-              <BarChart3 className="h-5 w-5 text-gray-600" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-green-50 w-12 h-12">
-            <Scan className="h-5 w-5 text-green-600" />
-          </Button>
-          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Link href="/plant-lots">
-              <Leaf className="h-5 w-5 text-gray-600" />
-            </Link>
-          </Button>
-        </div>
-      </div>
+        <main className="max-w-6xl mx-auto py-12 px-6 lg:px-8">
+          <div className="space-y-8">
+            {/* Page Header */}
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-gray-900 mb-3 font-['Inter'] tracking-tight">
+                QR Code Scanner
+              </h2>
+              <p className="text-xl text-gray-600 font-light leading-relaxed">
+                Scan QR codes to quickly access plant lot information and health reports
+              </p>
+            </div>
 
-      <main className="max-w-6xl mx-auto py-12 px-6 lg:px-8">
-        <div className="space-y-8">
-          {/* Page Header */}
-          <div className="text-center">
-            <h2 className="text-4xl font-bold text-gray-900 mb-3 font-['Inter'] tracking-tight">
-              QR Code Scanner
-            </h2>
-            <p className="text-xl text-gray-600 font-light leading-relaxed">
-              Scan QR codes to quickly access plant lot information and health reports
-            </p>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <Card className="border-0 shadow-lg rounded-3xl bg-red-50 border-l-4 border-l-red-500">
-              <CardContent className="p-6">
-                <div className="text-red-700 font-medium">{error}</div>
-              </CardContent>
-            </Card>
-          )}
+            {/* Error Message */}
+            {error && (
+              <Card className="border-0 shadow-lg rounded-3xl bg-red-50 border-l-4 border-l-red-500">
+                <CardContent className="p-6">
+                  <div className="text-red-700 font-medium">{error}</div>
+                </CardContent>
+              </Card>
+            )}
 
           {!plantLot ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -544,6 +516,7 @@ export default function QRScannerPage() {
           )}
         </div>
       </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }
