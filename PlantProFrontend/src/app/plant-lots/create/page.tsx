@@ -145,7 +145,7 @@ export default function CreatePlantLotPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-600 text-xl mb-4">Access Denied</div>
-          <p className="text-gray-600 mb-4">You don't have permission to create plant lots.</p>
+                                <p className="text-gray-600 mb-4">You don&apos;t have permission to create plant lots.</p>
           <Link href="/dashboard" className="text-green-600 hover:text-green-700">
             ← Back to Dashboard
           </Link>

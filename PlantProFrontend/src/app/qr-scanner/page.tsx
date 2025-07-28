@@ -75,7 +75,7 @@ export default function QRScannerPage() {
 
     // In a real implementation, you would use a QR code library here
     // For now, we'll simulate QR code detection
-    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    // const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     
     // This is a placeholder - in reality you'd use a library like jsQR
     // const code = jsQR(imageData.data, imageData.width, imageData.height);
@@ -97,7 +97,7 @@ export default function QRScannerPage() {
       const lot = await plantLotsApi.getByQrCode(qrCode);
       setPlantLot(lot);
       stopCamera();
-    } catch (err) {
+    } catch (err: unknown) {
       setError(`QR code "${qrCode}" not found in database. This might be an invalid or unregistered plant lot.`);
     }
   };
@@ -277,7 +277,7 @@ export default function QRScannerPage() {
                   <div className="mt-6">
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Instructions:</h4>
                     <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Point camera at QR code and tap "Scan QR Code"</li>
+                      <li>• Point camera at QR code and tap &quot;Scan QR Code&quot;</li>
                       <li>• Or manually type/paste the QR code text</li>
                       <li>• QR codes are usually in format: PLT-XXXXXXXXX</li>
                     </ul>
