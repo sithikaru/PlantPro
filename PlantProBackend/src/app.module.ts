@@ -6,6 +6,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getDatabaseConfig } from './config/database.config';
 import { AuthModule } from './auth/auth.module';
+import { PlantsModule } from './plants/plants.module';
+import { ZonesModule } from './zones/zones.module';
 import { SeedService } from './database/seed.service';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
@@ -24,6 +26,8 @@ import { User } from './users/entities/user.entity';
     }),
     TypeOrmModule.forFeature([User]),
     AuthModule,
+    PlantsModule,
+    ZonesModule,
   ],
   controllers: [AppController],
   providers: [

@@ -83,6 +83,12 @@ export class PlantLot {
   @Column({ nullable: true })
   assignedToId: number;
 
+  @Column({ type: 'datetime', nullable: true })
+  lastScannedAt: Date;
+
+  @Column({ nullable: true })
+  lastScannedBy: number;
+
   @OneToMany('HealthLog', 'plantLot')
   healthLogs: any[];
 }

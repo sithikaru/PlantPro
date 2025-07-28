@@ -57,7 +57,7 @@ export class PlantLotsService {
       qrCode,
       speciesId,
       zoneId,
-      assignedToId: assignedToId || null,
+      assignedToId: assignedToId || undefined,
     });
 
     return this.plantLotRepository.save(plantLot);
