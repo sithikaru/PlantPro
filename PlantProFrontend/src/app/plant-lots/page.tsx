@@ -41,7 +41,7 @@ export default function PlantLotsPage() {
       setError(null);
 
       // Fetch plant lots with filters
-      const filters: any = { page: currentPage, limit: 10 };
+      const filters: Record<string, any> = { page: currentPage, limit: 10 };
       if (selectedZone) filters.zoneId = parseInt(selectedZone);
       if (selectedSpecies) filters.speciesId = parseInt(selectedSpecies);
       if (selectedStatus) filters.status = selectedStatus;
@@ -85,7 +85,6 @@ export default function PlantLotsPage() {
   };
 
   const canManage = user?.role === 'manager' || user?.role === 'field_staff';
-  const canDelete = user?.role === 'manager';
 
   if (authLoading || loading) {
     return (
