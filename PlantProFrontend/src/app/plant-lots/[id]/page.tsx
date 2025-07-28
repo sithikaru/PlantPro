@@ -9,7 +9,8 @@ import { PlantLot } from '../../../lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
 import { Badge } from '../../../components/ui/badge';
-import { ArrowLeft, QrCode, Download, Edit, Plus, TrendingUp, Droplets, Sun, Thermometer, Activity, Calendar, MapPin, User, Leaf, BarChart3, Play } from 'lucide-react';
+import AppLayout from '../../../components/AppLayout';
+import { QrCode, Download, Edit, Plus, TrendingUp, Droplets, Sun, Thermometer, Activity, Calendar, MapPin, User, Play } from 'lucide-react';
 import HealthLogHistory from '../../../components/health-log-history';
 
 interface PlantLotDetailPageProps {
@@ -83,16 +84,18 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-green-50">
-        <Card className="w-96">
-          <CardContent className="p-6">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto"></div>
-              <p className="mt-4 text-green-600">Loading plant lot details...</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AppLayout>
+        <div className="min-h-screen flex items-center justify-center bg-green-50">
+          <Card className="w-96">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto"></div>
+                <p className="mt-4 text-green-600">Loading plant lot details...</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
 
@@ -102,22 +105,23 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-green-50">
-        <Card className="w-96">
-          <CardContent className="p-6">
-            <div className="text-center">
-              <div className="text-red-600 text-xl mb-4">Error</div>
-              <p className="text-gray-600 mb-4">{error}</p>
-              <Button asChild variant="outline">
-                <Link href="/plant-lots">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Plant Lots
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AppLayout>
+        <div className="min-h-screen flex items-center justify-center bg-green-50">
+          <Card className="w-96">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="text-red-600 text-xl mb-4">Error</div>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <Button asChild variant="outline">
+                  <Link href="/plant-lots">
+                    Back to Plant Lots
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
 

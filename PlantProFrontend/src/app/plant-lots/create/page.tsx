@@ -198,32 +198,15 @@ export default function CreatePlantLotPage() {
               <CardContent className="p-8">
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Lot Number */}
-                    <div className="space-y-3">
-                      <Label htmlFor="lotNumber" className="text-gray-700 font-medium">
-                        Lot Number *
-                      </Label>
-                      <Input
-                        id="lotNumber"
-                        name="lotNumber"
-                        type="text"
-                        value={formData.lotNumber}
-                        onChange={handleInputChange}
-                        className="rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500"
-                        placeholder="Enter unique lot number"
-                        required
-                      />
-                    </div>
-
                     {/* Plant Species */}
                     <div className="space-y-3">
-                      <Label htmlFor="plantSpeciesId" className="text-gray-700 font-medium">
+                      <Label htmlFor="speciesId" className="text-gray-700 font-medium">
                         Plant Species *
                       </Label>
                       <select
-                        id="plantSpeciesId"
-                        name="plantSpeciesId"
-                        value={formData.plantSpeciesId}
+                        id="speciesId"
+                        name="speciesId"
+                        value={formData.speciesId}
                         onChange={handleInputChange}
                         className="w-full rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500 px-4 py-3"
                         required
@@ -235,41 +218,6 @@ export default function CreatePlantLotPage() {
                           </option>
                         ))}
                       </select>
-                    </div>
-
-                    {/* Planted Date */}
-                    <div className="space-y-3">
-                      <Label htmlFor="plantedDate" className="text-gray-700 font-medium flex items-center">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Planted Date *
-                      </Label>
-                      <Input
-                        id="plantedDate"
-                        name="plantedDate"
-                        type="date"
-                        value={formData.plantedDate}
-                        onChange={handleInputChange}
-                        className="rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500"
-                        required
-                      />
-                    </div>
-
-                    {/* Quantity Planted */}
-                    <div className="space-y-3">
-                      <Label htmlFor="quantityPlanted" className="text-gray-700 font-medium">
-                        Quantity Planted *
-                      </Label>
-                      <Input
-                        id="quantityPlanted"
-                        name="quantityPlanted"
-                        type="number"
-                        min="1"
-                        value={formData.quantityPlanted || ''}
-                        onChange={handleInputChange}
-                        className="rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500"
-                        placeholder="Enter number of plants"
-                        required
-                      />
                     </div>
 
                     {/* Zone */}
@@ -295,8 +243,43 @@ export default function CreatePlantLotPage() {
                       </select>
                     </div>
 
-                    {/* Assigned To */}
+                    {/* Planted Date */}
                     <div className="space-y-3">
+                      <Label htmlFor="plantedDate" className="text-gray-700 font-medium flex items-center">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Planted Date *
+                      </Label>
+                      <Input
+                        id="plantedDate"
+                        name="plantedDate"
+                        type="date"
+                        value={formData.plantedDate}
+                        onChange={handleInputChange}
+                        className="rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500"
+                        required
+                      />
+                    </div>
+
+                    {/* Plant Count */}
+                    <div className="space-y-3">
+                      <Label htmlFor="plantCount" className="text-gray-700 font-medium">
+                        Plant Count *
+                      </Label>
+                      <Input
+                        id="plantCount"
+                        name="plantCount"
+                        type="number"
+                        min="1"
+                        value={formData.plantCount || ''}
+                        onChange={handleInputChange}
+                        className="rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500"
+                        placeholder="Enter number of plants"
+                        required
+                      />
+                    </div>
+
+                    {/* Assigned To */}
+                    <div className="space-y-3 md:col-span-2">
                       <Label htmlFor="assignedToId" className="text-gray-700 font-medium flex items-center">
                         <Users className="mr-2 h-4 w-4" />
                         Assigned To *

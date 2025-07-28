@@ -8,7 +8,8 @@ import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { dashboardApi, DashboardSummary } from '../../services/dashboard';
-import { TrendingUp, Users, MapPin, BarChart3, Plus, QrCode, FileText, Leaf, Activity, Calendar, User } from 'lucide-react';
+import AppLayout from '../../components/AppLayout';
+import { TrendingUp, Users, MapPin, BarChart3, Plus, QrCode, FileText, Activity, Calendar, User } from 'lucide-react';
 
 export default function DashboardPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -76,7 +77,8 @@ export default function DashboardPage() {
   const canViewReports = true; // All roles can view reports
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AppLayout>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -106,24 +108,6 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Sidebar Navigation */}
-      <div className="fixed left-6 top-1/2 transform -translate-y-1/2 z-10 hidden lg:block">
-        <div className="flex flex-col space-y-4">
-          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <BarChart3 className="h-5 w-5 text-gray-600" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-green-50 w-12 h-12">
-            <Leaf className="h-5 w-5 text-green-600" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Users className="h-5 w-5 text-gray-600" />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Activity className="h-5 w-5 text-gray-600" />
-          </Button>
-        </div>
-      </div>
-
       {/* Main Content */}
       <main className="max-w-6xl mx-auto py-12 px-6 lg:px-8">
         <div className="space-y-8">
@@ -144,7 +128,7 @@ export default function DashboardPage() {
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-                      <Leaf className="h-6 w-6 text-green-600" />
+                      <Activity className="h-6 w-6 text-green-600" />
                     </div>
                   </div>
                   <div className="ml-6 flex-1">
@@ -209,7 +193,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Button asChild className="h-14 rounded-2xl bg-green-600 hover:bg-green-700 font-medium shadow-lg hover:shadow-xl transition-all duration-300">
                   <Link href="/plant-lots">
-                    <Leaf className="mr-3 h-5 w-5" />
+                    <Activity className="mr-3 h-5 w-5" />
                     View Plant Lots
                   </Link>
                 </Button>
@@ -258,6 +242,7 @@ export default function DashboardPage() {
           </Card>
         </div>
       </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

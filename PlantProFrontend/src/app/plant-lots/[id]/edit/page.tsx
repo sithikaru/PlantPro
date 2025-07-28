@@ -11,13 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../../components
 import { Input } from '../../../../components/ui/input';
 import { Label } from '../../../../components/ui/label';
 import { Textarea } from '../../../../components/ui/textarea';
+import AppLayout from '../../../../components/AppLayout';
 import { 
-  ArrowLeft, 
   Edit3, 
-  Leaf, 
   Activity,
-  BarChart3,
-  Scan,
   Save
 } from 'lucide-react';
 
@@ -181,123 +178,96 @@ function EditPlantLotPageClient({ lotId }: { lotId: number }) {
 
   if (user.role === 'analytics') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-96 border-0 shadow-xl rounded-3xl">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Activity className="h-8 w-8 text-red-600" />
+      <AppLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="w-96 border-0 shadow-xl rounded-3xl">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Activity className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h3>
+                <p className="text-gray-600 mb-6">You don't have permission to edit plant lots.</p>
+                <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl">
+                  <Link href="/dashboard">
+                    Back to Dashboard
+                  </Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h3>
-              <p className="text-gray-600 mb-6">You don't have permission to edit plant lots.</p>
-              <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl">
-                <Link href="/dashboard">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Dashboard
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
 
   if (error && !plantLot) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-96 border-0 shadow-xl rounded-3xl">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Activity className="h-8 w-8 text-red-600" />
+      <AppLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="w-96 border-0 shadow-xl rounded-3xl">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Activity className="h-8 w-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Error</h3>
+                <p className="text-gray-600 mb-6">{error}</p>
+                <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl">
+                  <Link href="/plant-lots">
+                    Back to Plant Lots
+                  </Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Error</h3>
-              <p className="text-gray-600 mb-6">{error}</p>
-              <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl">
-                <Link href="/plant-lots">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Plant Lots
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
 
   if (!plantLot) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-96 border-0 shadow-xl rounded-3xl">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Leaf className="h-8 w-8 text-gray-600" />
+      <AppLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="w-96 border-0 shadow-xl rounded-3xl">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Activity className="h-8 w-8 text-gray-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Plant Lot Not Found</h3>
+                <p className="text-gray-600 mb-6">The requested plant lot could not be found.</p>
+                <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl">
+                  <Link href="/plant-lots">
+                    Back to Plant Lots
+                  </Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Plant Lot Not Found</h3>
-              <p className="text-gray-600 mb-6">The requested plant lot could not be found.</p>
-              <Button asChild className="bg-green-600 hover:bg-green-700 rounded-2xl">
-                <Link href="/plant-lots">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Plant Lots
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center space-x-6">
-              <Button asChild variant="ghost" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full px-4">
-                <Link href={`/plant-lots/${lotId}`}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Plant Lot Details
-                </Link>
-              </Button>
-              <div className="h-6 w-px bg-gray-200"></div>
-              <h1 className="text-2xl font-bold text-gray-900 font-['Inter'] tracking-tight">
-                Edit: {plantLot.lotNumber}
-              </h1>
+    <AppLayout>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              <div className="flex items-center space-x-6">
+                <h1 className="text-2xl font-bold text-gray-900 font-['Inter'] tracking-tight">
+                  Edit: {plantLot.lotNumber}
+                </h1>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Sidebar Navigation */}
-      <div className="fixed left-6 top-1/2 transform -translate-y-1/2 z-10 hidden lg:block">
-        <div className="flex flex-col space-y-4">
-          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Link href="/dashboard">
-              <BarChart3 className="h-5 w-5 text-gray-600" />
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Link href="/qr-scanner">
-              <Scan className="h-5 w-5 text-gray-600" />
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-50 w-12 h-12">
-            <Link href="/plant-lots">
-              <Leaf className="h-5 w-5 text-gray-600" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-white shadow-md hover:shadow-lg hover:bg-green-50 w-12 h-12">
-            <Edit3 className="h-5 w-5 text-green-600" />
-          </Button>
-        </div>
-      </div>
-
-      <main className="max-w-4xl mx-auto py-12 px-6 lg:px-8">
+        <main className="max-w-4xl mx-auto py-12 px-6 lg:px-8">
         <div className="space-y-8">
           {/* Page Header */}
           <div className="text-center">
@@ -616,7 +586,8 @@ function EditPlantLotPageClient({ lotId }: { lotId: number }) {
           </Card>
         </div>
       </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }
 
@@ -633,16 +604,18 @@ export default function EditPlantLotPage({ params }: EditPlantLotPageProps) {
 
   if (lotId === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-96 border-0 shadow-xl rounded-3xl">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto"></div>
-              <p className="mt-6 text-gray-600 font-medium">Loading...</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AppLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Card className="w-96 border-0 shadow-xl rounded-3xl">
+            <CardContent className="p-8">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto"></div>
+                <p className="mt-6 text-gray-600 font-medium">Loading...</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
   
