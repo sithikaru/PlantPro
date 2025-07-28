@@ -7,7 +7,7 @@ async function bootstrap() {
   const seedService = app.get(SeedService);
   
   try {
-    await seedService.seedUsers();
+    await seedService.seedAll();
     console.log('Seeding completed successfully');
   } catch (error) {
     console.error('Seeding failed:', error);
