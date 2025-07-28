@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { plantLotsApi } from '../../../lib/api';
 import { PlantLot } from '../../../lib/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Badge } from '../../../components/ui/badge';
+import { ArrowLeft, QrCode, Download, Edit, Plus, TrendingUp } from 'lucide-react';
 
 interface PlantLotDetailPageProps {
   params: Promise<{
@@ -39,6 +43,16 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
       setError(null);
       const lot = await plantLotsApi.getById(lotId);
       setPlantLot(lot);
+      // Try to load QR code if it exists
+      if (lot && !lot.qrCode) {
+        try {
+          const qrCodeResponse = await plantLotsApi.getQrCode(lotId);
+          setPlantLot(prev => prev ? { ...prev, qrCode: qrCodeResponse.qrCode } : null);
+        } catch (qrErr) {
+          // QR code doesn't exist yet, that's fine
+          console.log('QR code not available yet');
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch plant lot');
     } finally {
@@ -57,7 +71,7 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+          switch (status) {
       case 'seedling':
         return 'bg-yellow-100 text-yellow-800';
       case 'growing':
@@ -296,7 +310,7 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                     <div className="text-center">
                       <div className="mb-4">
                         <img
-                          src={`data:image/png;base64,${plantLot.qrCode}`}
+                          src={plantLot.qrCode}
                           alt="Plant Lot QR Code"
                           className="mx-auto"
                           width="200"
@@ -309,7 +323,7 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                       <button
                         onClick={() => {
                           const link = document.createElement('a');
-                          link.href = `data:image/png;base64,${plantLot.qrCode}`;
+                          link.href = plantLot.qrCode;
                           link.download = `plant-lot-${plantLot.lotNumber}-qr.png`;
                           link.click();
                         }}
