@@ -144,4 +144,20 @@ export class HealthLogsController {
   getAnalytics(@Param('plantLotId', ParseIntPipe) plantLotId: number) {
     return this.healthLogsService.getAnalyticsForPlantLot(plantLotId);
   }
+
+  @Get('historical-analytics/:plantLotId')
+  @Roles(UserRole.MANAGER, UserRole.ANALYTICS, UserRole.FIELD_STAFF)
+  @ApiOperation({ summary: 'Get comprehensive historical analytics for a plant lot' })
+  @ApiParam({ name: 'plantLotId', type: Number })
+  getHistoricalAnalytics(@Param('plantLotId', ParseIntPipe) plantLotId: number) {
+    return this.healthLogsService.getHistoricalAnalytics(plantLotId);
+  }
+
+  @Post('trigger-analysis/:plantLotId')
+  @Roles(UserRole.FIELD_STAFF, UserRole.MANAGER)
+  @ApiOperation({ summary: 'Trigger AI analysis for a plant lot (cost-effective on-demand analysis)' })
+  @ApiParam({ name: 'plantLotId', type: Number })
+  triggerAIAnalysis(@Param('plantLotId', ParseIntPipe) plantLotId: number) {
+    return this.healthLogsService.triggerAIAnalysis(plantLotId);
+  }
 }

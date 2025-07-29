@@ -299,12 +299,20 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                         <CardDescription>Track health changes over time</CardDescription>
                       </div>
                     </div>
-                    <Link href={`/health-logs/new?plantLotId=${plantLot.id}`}>
-                      <Button size="sm" className="rounded-xl">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Log
-                      </Button>
-                    </Link>
+                    <div className="flex space-x-2">
+                      <Link href={`/health-logs/na/plantLotId=${plantLot.id}`}>
+                        <Button size="sm" variant="outline" className="rounded-xl">
+                          <Activity className="w-4 h-4 mr-2" />
+                          Analyze Health
+                        </Button>
+                      </Link>
+                      <Link href={`/health-logs/new?plantLotId=${plantLot.id}`}>
+                        <Button size="sm" className="rounded-xl">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Log
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

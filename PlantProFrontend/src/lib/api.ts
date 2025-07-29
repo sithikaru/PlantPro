@@ -151,4 +151,10 @@ export const healthLogsApi = {
 
   getAnalytics: (plantLotId: number): Promise<Record<string, unknown>> =>
     apiClient.get(`/health-logs/analytics/${plantLotId}`),
+
+  getHistoricalAnalytics: (plantLotId: number): Promise<Record<string, unknown>> =>
+    apiClient.get(`/health-logs/historical-analytics/${plantLotId}`),
+
+  triggerAnalysis: (plantLotId: number): Promise<Record<string, unknown>> =>
+    apiClient.post(`/health-logs/trigger-analysis/${plantLotId}`),
 };
