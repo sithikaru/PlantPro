@@ -4,15 +4,17 @@ import { HealthLogsService } from './health-logs.service';
 import { HealthLogsController } from './health-logs.controller';
 import { HealthLog } from './health-log.entity';
 import { AIAnalysisService } from './services/ai-analysis.service';
-import { ImageUploadService } from './services/image-upload.service';
+import { CommonModule } from '../common/common.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([HealthLog])],
+  imports: [
+    TypeOrmModule.forFeature([HealthLog]),
+    CommonModule,
+  ],
   controllers: [HealthLogsController],
   providers: [
     HealthLogsService,
     AIAnalysisService,
-    ImageUploadService,
   ],
   exports: [HealthLogsService],
 })

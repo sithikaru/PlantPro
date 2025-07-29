@@ -5,7 +5,7 @@ import { HealthLog, AnalysisStatus } from './health-log.entity';
 import { CreateHealthLogDto } from './dto/create-health-log.dto';
 import { UpdateHealthLogDto } from './dto/update-health-log.dto';
 import { AIAnalysisService } from './services/ai-analysis.service';
-import { ImageUploadService } from './services/image-upload.service';
+import { CloudStorageService } from '../common/services/cloud-storage.service';
 
 @Injectable()
 export class HealthLogsService {
@@ -15,7 +15,7 @@ export class HealthLogsService {
     @InjectRepository(HealthLog)
     private healthLogRepository: Repository<HealthLog>,
     private aiAnalysisService: AIAnalysisService,
-    private imageUploadService: ImageUploadService,
+    private cloudStorageService: CloudStorageService,
   ) {}
 
   async create(createHealthLogDto: CreateHealthLogDto, userId: number): Promise<HealthLog> {
@@ -46,8 +46,9 @@ export class HealthLogsService {
       // Only process images if files are provided
       if (files && files.length > 0) {
         // Validate and upload images
-        this.imageUploadService.validateMultipleImageFiles(files);
-        imageUrls = await this.imageUploadService.uploadMultipleImages(files);
+        this.cloudStorageService.validateMultipleImageFiles(files);
+        const uploadResults = await this.cloudStorageService.uploadMultipleFiles(files, 'health-logs');
+        imageUrls = uploadResults.map(result => result.url);
       }
 
       // Create health log with uploaded image URLs (or empty array)
@@ -106,7 +107,12 @@ export class HealthLogsService {
     // Delete associated images
     if (healthLog.images && healthLog.images.length > 0) {
       for (const imageUrl of healthLog.images) {
-        await this.imageUploadService.deleteImage(imageUrl);
+        // Extract the key from the URL to delete the file
+        const urlParts = imageUrl.split('/uploads/');
+        if (urlParts.length > 1) {
+          const key = urlParts[1];
+          await this.cloudStorageService.deleteFile(key);
+        }
       }
     }
 
