@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { plantLotsApi, plantSpeciesApi, zonesApi, usersApi } from '../../../lib/api';
-import { PlantSpecies, Zone, User, CreatePlantLotData } from '../../../lib/types';
+import { plantLotsApi, plantSpeciesApi, zonesApi } from '../../../lib/api';
+import { PlantSpecies, Zone, CreatePlantLotData } from '../../../lib/types';
 
 // Form state interface with optional fields for better form handling
 interface PlantLotFormData {
@@ -14,7 +14,6 @@ interface PlantLotFormData {
   plantCount?: number;
   plantedDate: string;
   expectedHarvestDate?: string;
-  assignedToId?: number;
   notes?: string;
   location?: {
     section: string;
@@ -31,7 +30,6 @@ import AppLayout from '../../../components/AppLayout';
 import { 
   Plus, 
   MapPin, 
-  Users, 
   Calendar, 
   Activity
 } from 'lucide-react';
@@ -41,7 +39,6 @@ export default function CreatePlantLotPage() {
   const router = useRouter();
   const [plantSpecies, setPlantSpecies] = useState<PlantSpecies[]>([]);
   const [zones, setZones] = useState<Zone[]>([]);
-  const [fieldStaff, setFieldStaff] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -69,15 +66,13 @@ export default function CreatePlantLotPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [speciesRes, zonesRes, staffRes] = await Promise.all([
+      const [speciesRes, zonesRes] = await Promise.all([
         plantSpeciesApi.getAll(),
-        zonesApi.getAll(),
-        usersApi.getAll()
+        zonesApi.getAll()
       ]);
 
       setPlantSpecies(speciesRes);
       setZones(zonesRes);
-      setFieldStaff(staffRes.filter((u: User) => u.role === 'field_staff'));
     } catch (err) {
       console.error('Error fetching data:', err);
       setError('Failed to load required data');
@@ -90,7 +85,7 @@ export default function CreatePlantLotPage() {
     const { name, value, type } = e.target;
     
     // Handle numeric fields (both input[type="number"] and select with numeric values)
-    if (type === 'number' || (type === 'select-one' && ['speciesId', 'zoneId', 'assignedToId'].includes(name))) {
+    if (type === 'number' || (type === 'select-one' && ['speciesId', 'zoneId'].includes(name))) {
       setFormData(prev => ({
         ...prev,
         [name]: value ? parseInt(value) : undefined
@@ -130,9 +125,6 @@ export default function CreatePlantLotPage() {
       }
       if (formData.expectedHarvestDate) {
         submitData.expectedHarvestDate = formData.expectedHarvestDate;
-      }
-      if (formData.assignedToId) {
-        submitData.assignedToId = formData.assignedToId;
       }
       if (formData.location) {
         submitData.location = formData.location;
@@ -319,28 +311,6 @@ export default function CreatePlantLotPage() {
                         placeholder="Enter number of plants"
                         required
                       />
-                    </div>
-
-                    {/* Assigned To */}
-                    <div className="space-y-3 md:col-span-2">
-                      <Label htmlFor="assignedToId" className="text-gray-700 font-medium flex items-center">
-                        <Users className="mr-2 h-4 w-4" />
-                        Assigned To (Optional)
-                      </Label>
-                      <select
-                        id="assignedToId"
-                        name="assignedToId"
-                        value={formData.assignedToId || ''}
-                        onChange={handleInputChange}
-                        className="w-full rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500 px-4 py-3"
-                      >
-                        <option value="">No specific assignment</option>
-                        {fieldStaff.map(staff => (
-                          <option key={staff.id} value={staff.id}>
-                            {staff.firstName} {staff.lastName}
-                          </option>
-                        ))}
-                      </select>
                     </div>
                   </div>
 
