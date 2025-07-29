@@ -126,10 +126,10 @@ export default function GlobalNavigation() {
             description: 'Edit plant lot details'
           },
           {
-            icon: Activity,
-            label: 'Health Logs',
-            href: pathname + '/health-log',
-            description: 'View health history'
+            icon: Plus,
+            label: 'Add Health Log',
+            href: pathname + '/health-log/create',
+            description: 'Add new health log entry'
           }
         );
       }

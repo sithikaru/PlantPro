@@ -28,6 +28,14 @@ function HealthLogPageClient({ lotId }: { lotId: number }) {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
+    // Check if we should auto-open the form based on URL search params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('create') === 'true') {
+      setShowHealthForm(true);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
     }
