@@ -26,8 +26,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Roles(UserRole.MANAGER)
-  @ApiOperation({ summary: 'Get all users (Manager only)' })
+  @Roles(UserRole.MANAGER, UserRole.FIELD_STAFF)
+  @ApiOperation({ summary: 'Get all users (Manager and Field Staff)' })
   @ApiResponse({ status: 200, description: 'List of all users', type: [UserResponseDto] })
   findAll(): Promise<UserResponseDto[]> {
     return this.usersService.findAll();

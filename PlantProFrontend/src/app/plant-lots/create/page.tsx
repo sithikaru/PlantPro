@@ -6,6 +6,22 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { plantLotsApi, plantSpeciesApi, zonesApi, usersApi } from '../../../lib/api';
 import { PlantSpecies, Zone, User, CreatePlantLotData } from '../../../lib/types';
+
+// Form state interface with optional fields for better form handling
+interface PlantLotFormData {
+  speciesId?: number;
+  zoneId?: number;
+  plantCount?: number;
+  plantedDate: string;
+  expectedHarvestDate?: string;
+  assignedToId?: number;
+  notes?: string;
+  location?: {
+    section: string;
+    row: number;
+    column: number;
+  };
+}
 import { Button } from '../../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Input } from '../../../components/ui/input';
@@ -31,12 +47,8 @@ export default function CreatePlantLotPage() {
   const [submitting, setSubmitting] = useState(false);
 
   // Form state
-  const [formData, setFormData] = useState<CreatePlantLotData>({
-    speciesId: 0,
+  const [formData, setFormData] = useState<PlantLotFormData>({
     plantedDate: '',
-    plantCount: 0,
-    zoneId: 0,
-    assignedToId: 0,
     notes: ''
   });
 
@@ -47,9 +59,9 @@ export default function CreatePlantLotPage() {
   }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
-    if (isAuthenticated && user?.role !== 'field_staff') {
+    if (isAuthenticated && (user?.role === 'manager' || user?.role === 'field_staff')) {
       fetchData();
-    } else if (isAuthenticated && user?.role === 'field_staff') {
+    } else if (isAuthenticated && user?.role === 'analytics') {
       router.push('/plant-lots');
     }
   }, [isAuthenticated, user, router]);
@@ -76,17 +88,26 @@ export default function CreatePlantLotPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'number' ? parseInt(value) || 0 : value
-    }));
+    
+    // Handle numeric fields (both input[type="number"] and select with numeric values)
+    if (type === 'number' || (type === 'select-one' && ['speciesId', 'zoneId', 'assignedToId'].includes(name))) {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value ? parseInt(value) : undefined
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.speciesId || !formData.plantedDate || 
-        !formData.plantCount || !formData.zoneId || !formData.assignedToId) {
+        !formData.plantCount || !formData.zoneId) {
       setError('Please fill in all required fields');
       return;
     }
@@ -95,11 +116,33 @@ export default function CreatePlantLotPage() {
       setSubmitting(true);
       setError(null);
       
-      await plantLotsApi.create(formData);
+      // Clean the form data to ensure we don't send empty values for optional fields
+      const submitData: CreatePlantLotData = {
+        speciesId: formData.speciesId,
+        zoneId: formData.zoneId,
+        plantCount: formData.plantCount,
+        plantedDate: formData.plantedDate,
+      };
+      
+      // Only include optional fields if they have values
+      if (formData.notes) {
+        submitData.notes = formData.notes;
+      }
+      if (formData.expectedHarvestDate) {
+        submitData.expectedHarvestDate = formData.expectedHarvestDate;
+      }
+      if (formData.assignedToId) {
+        submitData.assignedToId = formData.assignedToId;
+      }
+      if (formData.location) {
+        submitData.location = formData.location;
+      }
+      
+      await plantLotsApi.create(submitData);
       router.push('/plant-lots');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error creating plant lot:', err);
-      setError(err.response?.data?.message || 'Failed to create plant lot');
+      setError((err as {response?: {data?: {message?: string}}})?.response?.data?.message || 'Failed to create plant lot');
     } finally {
       setSubmitting(false);
     }
@@ -122,7 +165,7 @@ export default function CreatePlantLotPage() {
     return null;
   }
 
-  if (user.role === 'field_staff') {
+  if (user.role === 'analytics') {
     return (
       <AppLayout>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -131,7 +174,7 @@ export default function CreatePlantLotPage() {
               <div className="text-red-600 text-5xl mb-4">🚫</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
               <p className="text-gray-600 mb-6">
-                You don't have permission to create plant lots.
+                You don&apos;t have permission to create plant lots.
               </p>
               <Button asChild className="bg-green-600 hover:bg-green-700">
                 <Link href="/plant-lots">Back to Plant Lots</Link>
@@ -206,7 +249,7 @@ export default function CreatePlantLotPage() {
                       <select
                         id="speciesId"
                         name="speciesId"
-                        value={formData.speciesId}
+                        value={formData.speciesId || ''}
                         onChange={handleInputChange}
                         className="w-full rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500 px-4 py-3"
                         required
@@ -229,7 +272,7 @@ export default function CreatePlantLotPage() {
                       <select
                         id="zoneId"
                         name="zoneId"
-                        value={formData.zoneId}
+                        value={formData.zoneId || ''}
                         onChange={handleInputChange}
                         className="w-full rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500 px-4 py-3"
                         required
@@ -282,17 +325,16 @@ export default function CreatePlantLotPage() {
                     <div className="space-y-3 md:col-span-2">
                       <Label htmlFor="assignedToId" className="text-gray-700 font-medium flex items-center">
                         <Users className="mr-2 h-4 w-4" />
-                        Assigned To *
+                        Assigned To (Optional)
                       </Label>
                       <select
                         id="assignedToId"
                         name="assignedToId"
-                        value={formData.assignedToId}
+                        value={formData.assignedToId || ''}
                         onChange={handleInputChange}
                         className="w-full rounded-2xl border-gray-200 focus:border-green-500 focus:ring-green-500 px-4 py-3"
-                        required
                       >
-                        <option value="">Select field staff</option>
+                        <option value="">No specific assignment</option>
                         {fieldStaff.map(staff => (
                           <option key={staff.id} value={staff.id}>
                             {staff.firstName} {staff.lastName}

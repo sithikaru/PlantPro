@@ -29,7 +29,7 @@ export class DashboardController {
   ) {}
 
   @Get('summary')
-  @Roles(UserRole.MANAGER, UserRole.ANALYTICS)
+  @Roles(UserRole.MANAGER, UserRole.ANALYTICS, UserRole.FIELD_STAFF)
   @ApiOperation({ summary: 'Get dashboard summary statistics' })
   @ApiResponse({ status: 200, description: 'Dashboard summary retrieved successfully' })
   async getDashboardSummary() {
@@ -54,7 +54,7 @@ export class DashboardController {
   }
 
   @Get('zones')
-  @Roles(UserRole.MANAGER, UserRole.ANALYTICS)
+  @Roles(UserRole.MANAGER, UserRole.ANALYTICS, UserRole.FIELD_STAFF)
   @ApiOperation({ summary: 'Get zone analytics' })
   @ApiResponse({ status: 200, description: 'Zone analytics retrieved successfully' })
   async getZoneAnalytics() {
