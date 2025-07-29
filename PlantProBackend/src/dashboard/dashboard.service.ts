@@ -443,26 +443,17 @@ export class DashboardService {
   }
 
   private async getSystemHealthSummary() {
-    const totalAnalysis = await this.healthLogRepository.count({
-      where: { analysisStatus: In([AnalysisStatus.COMPLETED, AnalysisStatus.FAILED]) },
-    });
-
-    const successfulAnalysis = await this.healthLogRepository.count({
-      where: { analysisStatus: AnalysisStatus.COMPLETED },
-    });
-
-    const pendingAnalysis = await this.healthLogRepository.count({
-      where: { analysisStatus: AnalysisStatus.PENDING },
-    });
-
     const failedAnalysis = await this.healthLogRepository.count({
       where: { analysisStatus: AnalysisStatus.FAILED },
     });
 
+    const activeConnections = 1; // Simplified - could be enhanced with actual connection monitoring
+    const databaseStatus = 'healthy'; // Simplified - could be enhanced with actual DB health check
+
     return {
-      aiAnalysisSuccess: totalAnalysis > 0 ? successfulAnalysis / totalAnalysis : 0,
-      pendingAnalysis,
       systemErrors: failedAnalysis,
+      activeConnections,
+      databaseStatus,
     };
   }
 }

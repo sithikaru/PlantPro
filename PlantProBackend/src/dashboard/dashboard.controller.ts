@@ -113,7 +113,7 @@ export class DashboardController {
       averageHealthScore: summary.healthMetrics.averageHealthScore,
       recentIssues: summary.healthMetrics.recentIssues,
       activeFieldStaff: summary.userActivity.activeFieldStaff,
-      systemHealth: summary.systemHealth.aiAnalysisSuccess,
+      systemHealth: summary.systemHealth.systemErrors,
     };
   }
 
@@ -142,11 +142,11 @@ export class DashboardController {
       });
     }
 
-    if (summary.systemHealth.pendingAnalysis > 10) {
+    if (summary.systemHealth.systemErrors > 5) {
       alerts.push({
         type: 'warning',
-        title: 'Pending Analyses Backlog',
-        message: `${summary.systemHealth.pendingAnalysis} analyses pending`,
+        title: 'System Errors Detected',
+        message: `${summary.systemHealth.systemErrors} system errors logged`,
         priority: 'medium',
         timestamp: new Date(),
       });
