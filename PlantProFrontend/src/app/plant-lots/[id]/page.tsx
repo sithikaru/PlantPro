@@ -300,13 +300,13 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      <Link href={`/health-logs/na/plantLotId=${plantLot.id}`}>
+                      <Link href={`/health-logs/analytics/${plantLot.id}`}>
                         <Button size="sm" variant="outline" className="rounded-xl">
                           <Activity className="w-4 h-4 mr-2" />
                           Analyze Health
                         </Button>
                       </Link>
-                      <Link href={`/health-logs/new?plantLotId=${plantLot.id}`}>
+                      <Link href={`/plant-lots/${plantLot.id}/health-log`}>
                         <Button size="sm" className="rounded-xl">
                           <Plus className="w-4 h-4 mr-2" />
                           Add Log
@@ -451,7 +451,7 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                   <CardDescription>Common tasks for this lot</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Link href={`/health-logs/new?plantLotId=${plantLot.id}`}>
+                  <Link href={`/plant-lots/${plantLot.id}/health-log`}>
                     <Button variant="outline" className="w-full justify-start rounded-xl">
                       <Plus className="w-4 h-4 mr-3" />
                       Add Health Log
