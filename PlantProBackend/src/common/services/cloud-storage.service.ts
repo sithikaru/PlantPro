@@ -19,6 +19,8 @@ export class CloudStorageService {
   constructor(private configService: ConfigService) {
     this.uploadPath = path.join(process.cwd(), 'uploads');
     this.baseUrl = this.configService.get<string>('BASE_URL', 'http://localhost:3000');
+    const apiPrefix = this.configService.get<string>('API_PREFIX', 'api/v1');
+    this.baseUrl = `${this.baseUrl}/${apiPrefix}`;
     
     // Ensure upload directory exists
     if (!fs.existsSync(this.uploadPath)) {
