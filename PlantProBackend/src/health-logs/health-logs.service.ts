@@ -121,15 +121,47 @@ export class HealthLogsService {
 
   private async processAIAnalysis(healthLogId: number, imageUrls: string[]): Promise<void> {
     try {
-      this.logger.log(`Starting AI analysis for health log ${healthLogId}`);
+      this.logger.log(`Starting comprehensive AI analysis for health log ${healthLogId}`);
       
       // Update status to processing
       await this.healthLogRepository.update(healthLogId, {
         analysisStatus: AnalysisStatus.PROCESSING
       });
 
-      // Perform AI analysis
-      const analysisResult = await this.aiAnalysisService.analyzeMultipleImages(imageUrls);
+      // Get complete health log data for analysis
+      const healthLog = await this.healthLogRepository.findOne({
+        where: { id: healthLogId },
+        relations: ['plantLot', 'plantLot.species', 'plantLot.zone']
+      });
+
+      if (!healthLog) {
+        throw new Error('Health log not found');
+      }
+
+      // Prepare comprehensive data for AI analysis
+      const analysisData = {
+        healthStatus: healthLog.healthStatus,
+        notes: healthLog.notes,
+        metrics: healthLog.metrics,
+        plantLotInfo: healthLog.plantLot ? {
+          species: healthLog.plantLot.species?.name,
+          zone: healthLog.plantLot.zone?.name,
+          plantedDate: healthLog.plantLot.plantedDate,
+          currentAge: healthLog.plantLot.plantedDate ? 
+            Math.floor((new Date().getTime() - new Date(healthLog.plantLot.plantedDate).getTime()) / (1000 * 60 * 60 * 24)) : undefined
+        } : undefined,
+        environmentalData: {
+          latitude: healthLog.latitude,
+          longitude: healthLog.longitude,
+          season: this.getCurrentSeason(),
+          weather: 'Unknown' // Could be enhanced with weather API
+        },
+        hasImages: imageUrls && imageUrls.length > 0,
+        imageCount: imageUrls ? imageUrls.length : 0
+      };
+
+      // Perform comprehensive AI analysis using all available data
+      const analysisResult = await this.aiAnalysisService.analyzeHealthLogData(analysisData);
 
       // Update health log with AI results
       await this.healthLogRepository.update(healthLogId, {
@@ -137,7 +169,7 @@ export class HealthLogsService {
         aiAnalysis: analysisResult,
       });
 
-      this.logger.log(`AI analysis completed for health log ${healthLogId}`);
+      this.logger.log(`Comprehensive AI analysis completed for health log ${healthLogId} with score: ${analysisResult.healthScore}`);
     } catch (error) {
       this.logger.error(`AI analysis failed for health log ${healthLogId}: ${error.message}`);
       
@@ -149,12 +181,19 @@ export class HealthLogsService {
     }
   }
 
+  private getCurrentSeason(): string {
+    const month = new Date().getMonth();
+    if (month >= 2 && month <= 4) return 'Spring';
+    if (month >= 5 && month <= 7) return 'Summer';
+    if (month >= 8 && month <= 10) return 'Fall';
+    return 'Winter';
+  }
+
   async retryAIAnalysis(id: number): Promise<HealthLog> {
     const healthLog = await this.findOne(id);
     
-    if (!healthLog.images || healthLog.images.length === 0) {
-      throw new Error('No images available for analysis');
-    }
+    // No longer require images since we analyze all health data
+    this.logger.log(`Retrying comprehensive AI analysis for health log ${id}`);
 
     // Reset analysis status and restart
     healthLog.analysisStatus = AnalysisStatus.PENDING;
@@ -163,8 +202,8 @@ export class HealthLogsService {
     
     const updatedLog = await this.healthLogRepository.save(healthLog);
     
-    // Start AI analysis
-    this.processAIAnalysis(id, healthLog.images);
+    // Start AI analysis with current images (if any)
+    this.processAIAnalysis(id, healthLog.images || []);
     
     return updatedLog;
   }
