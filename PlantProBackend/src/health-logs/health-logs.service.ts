@@ -239,6 +239,72 @@ export class HealthLogsService {
     };
   }
 
+  async getHistoricalAnalytics(plantLotId: number): Promise<any> {
+    try {
+      this.logger.log(`Getting historical analytics for plant lot ${plantLotId}`);
+      
+      // Get all health logs for the plant lot
+      const healthLogs = await this.healthLogRepository.find({
+        where: { plantLotId },
+        order: { recordedAt: 'ASC' },
+        relations: ['recordedBy'],
+      });
+
+      // Use AI service to analyze historical data
+      const analytics = await this.aiAnalysisService.analyzeHistoricalData(healthLogs);
+      
+      this.logger.log(`Historical analytics completed for plant lot ${plantLotId}`);
+      return analytics;
+      
+    } catch (error) {
+      this.logger.error(`Failed to get historical analytics: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async triggerAIAnalysis(plantLotId: number): Promise<any> {
+    try {
+      this.logger.log(`Triggering AI analysis for plant lot ${plantLotId}`);
+      
+      // Get the most recent health log for this plant lot
+      const latestLog = await this.healthLogRepository.findOne({
+        where: { plantLotId },
+        order: { recordedAt: 'DESC' },
+        relations: ['recordedBy'],
+      });
+
+      if (!latestLog) {
+        throw new NotFoundException('No health logs found for this plant lot');
+      }
+
+      // Get all health logs for comprehensive analysis
+      const allLogs = await this.healthLogRepository.find({
+        where: { plantLotId },
+        order: { recordedAt: 'ASC' },
+        relations: ['recordedBy'],
+      });
+
+      // Perform AI analysis on the latest log with historical context
+      await this.processAIAnalysis(latestLog.id, latestLog.images || []);
+      
+      // Also generate historical analytics
+      const analytics = await this.aiAnalysisService.analyzeHistoricalData(allLogs);
+      
+      // Return both the updated log and the historical analytics
+      const updatedLog = await this.findOne(latestLog.id);
+      
+      return {
+        latestAnalysis: updatedLog.aiAnalysis,
+        historicalAnalytics: analytics,
+        message: 'AI analysis completed successfully'
+      };
+      
+    } catch (error) {
+      this.logger.error(`Failed to trigger AI analysis: ${error.message}`);
+      throw error;
+    }
+  }
+
   private getCommonIssues(healthLogs: HealthLog[]): { issue: string; count: number }[] {
     const issueCount = {};
     

@@ -42,6 +42,64 @@ export interface AIAnalysisResult {
   };
 }
 
+export interface HistoricalAnalyticsResult {
+  currentHealthStatus: {
+    healthScore: number;
+    status: 'excellent' | 'good' | 'fair' | 'poor' | 'critical';
+    lastAnalyzed: Date;
+  };
+  historicalComparison: {
+    averageHealthScore: number;
+    trendDirection: 'improving' | 'stable' | 'declining';
+    percentageChange: number;
+    comparisonPeriod: string;
+  };
+  healthTrends: {
+    date: string;
+    healthScore: number;
+    diseaseDetected: boolean;
+    temperature?: number;
+    humidity?: number;
+    soilMoisture?: number;
+  }[];
+  environmentalTrends: {
+    temperatureAverage: number;
+    temperatureTrend: 'improving' | 'stable' | 'declining';
+    humidityAverage: number;
+    humidityTrend: 'improving' | 'stable' | 'declining';
+    soilMoistureAverage: number;
+    soilMoistureTrend: 'improving' | 'stable' | 'declining';
+  };
+  diseaseFrequencyAnalysis: {
+    totalEntries: number;
+    diseaseDetectionRate: number;
+    commonDiseases: { type: string; frequency: number; lastDetected: Date }[];
+    riskTrend: 'increasing' | 'stable' | 'decreasing';
+  };
+  growthProgression: {
+    heightProgression: { date: string; height: number }[];
+    leafCountProgression: { date: string; count: number }[];
+    flowerCountProgression: { date: string; count: number }[];
+    fruitCountProgression: { date: string; count: number }[];
+    growthRate: {
+      height: 'fast' | 'normal' | 'slow';
+      leafDevelopment: 'fast' | 'normal' | 'slow';
+      flowering: 'active' | 'moderate' | 'low';
+      fruiting: 'active' | 'moderate' | 'low';
+    };
+  };
+  recommendations: {
+    immediate: string[];
+    shortTerm: string[];
+    longTerm: string[];
+  };
+  alerts: {
+    type: 'warning' | 'error' | 'info';
+    message: string;
+    priority: 'high' | 'medium' | 'low';
+  }[];
+}
+
 @Injectable()
 export class AIAnalysisService {
   private readonly logger = new Logger(AIAnalysisService.name);
@@ -450,5 +508,396 @@ Provide specific, actionable, and scientifically-based recommendations.
   async analyzeImage(imageUrl: string): Promise<AIAnalysisResult> {
     this.logger.log('Legacy image analysis method called - using fallback analysis');
     return this.getFallbackAnalysis();
+  }
+
+  async analyzeHistoricalData(healthLogs: any[]): Promise<HistoricalAnalyticsResult> {
+    try {
+      this.logger.log(`Starting historical analysis for ${healthLogs.length} health logs`);
+
+      // Filter logs from last 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const recentLogs = healthLogs.filter(log => 
+        new Date(log.recordedAt) >= thirtyDaysAgo
+      ).sort((a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime());
+
+      if (recentLogs.length === 0) {
+        return this.getEmptyHistoricalAnalysis();
+      }
+
+      // Calculate current health status
+      const latestLog = recentLogs[recentLogs.length - 1];
+      const currentHealthScore = latestLog.aiAnalysis?.healthScore || 75;
+      
+      // Calculate historical comparison
+      const healthScores = recentLogs
+        .filter(log => log.aiAnalysis?.healthScore)
+        .map(log => log.aiAnalysis.healthScore);
+      
+      const averageHealthScore = healthScores.length > 0 
+        ? Math.round(healthScores.reduce((sum, score) => sum + score, 0) / healthScores.length)
+        : currentHealthScore;
+
+      // Calculate trend direction
+      const firstHalfAvg = this.calculateAverage(healthScores.slice(0, Math.floor(healthScores.length / 2)));
+      const secondHalfAvg = this.calculateAverage(healthScores.slice(Math.floor(healthScores.length / 2)));
+      const percentageChange = firstHalfAvg > 0 ? ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100 : 0;
+      
+      let trendDirection: 'improving' | 'stable' | 'declining' = 'stable';
+      if (Math.abs(percentageChange) > 5) {
+        trendDirection = percentageChange > 0 ? 'improving' : 'declining';
+      }
+
+      // Build health trends
+      const healthTrends = recentLogs.map(log => ({
+        date: new Date(log.recordedAt).toISOString().split('T')[0],
+        healthScore: log.aiAnalysis?.healthScore || 75,
+        diseaseDetected: log.aiAnalysis?.diseaseDetected || false,
+        temperature: log.metrics?.temperature,
+        humidity: log.metrics?.humidity,
+        soilMoisture: log.metrics?.soilMoisture,
+      }));
+
+      // Calculate environmental trends
+      const environmentalData = recentLogs
+        .filter(log => log.metrics)
+        .map(log => log.metrics);
+
+      const environmentalTrends = this.calculateEnvironmentalTrends(environmentalData);
+
+      // Disease frequency analysis
+      const diseaseAnalysis = this.calculateDiseaseFrequency(recentLogs);
+
+      // Growth progression
+      const growthProgression = this.calculateGrowthProgression(recentLogs);
+
+      // Generate recommendations and alerts
+      const recommendations = this.generateRecommendations(currentHealthScore, trendDirection, diseaseAnalysis);
+      const alerts = this.generateAlerts(currentHealthScore, trendDirection, diseaseAnalysis);
+
+      return {
+        currentHealthStatus: {
+          healthScore: currentHealthScore,
+          status: this.getHealthStatus(currentHealthScore),
+          lastAnalyzed: new Date(latestLog.recordedAt),
+        },
+        historicalComparison: {
+          averageHealthScore,
+          trendDirection,
+          percentageChange: Math.round(percentageChange * 100) / 100,
+          comparisonPeriod: '30 days',
+        },
+        healthTrends,
+        environmentalTrends,
+        diseaseFrequencyAnalysis: diseaseAnalysis,
+        growthProgression,
+        recommendations,
+        alerts,
+      };
+
+    } catch (error) {
+      this.logger.error(`Historical analysis failed: ${error.message}`);
+      return this.getEmptyHistoricalAnalysis();
+    }
+  }
+
+  private calculateAverage(numbers: number[]): number {
+    return numbers.length > 0 ? numbers.reduce((sum, num) => sum + num, 0) / numbers.length : 0;
+  }
+
+  private getHealthStatus(score: number): 'excellent' | 'good' | 'fair' | 'poor' | 'critical' {
+    if (score >= 90) return 'excellent';
+    if (score >= 80) return 'good';
+    if (score >= 70) return 'fair';
+    if (score >= 60) return 'poor';
+    return 'critical';
+  }
+
+  private calculateEnvironmentalTrends(environmentalData: any[]): any {
+    if (environmentalData.length === 0) {
+      return {
+        temperatureAverage: 0,
+        temperatureTrend: 'stable',
+        humidityAverage: 0,
+        humidityTrend: 'stable',
+        soilMoistureAverage: 0,
+        soilMoistureTrend: 'stable',
+      };
+    }
+
+    const temperatures = environmentalData.filter(d => d.temperature).map(d => d.temperature);
+    const humidities = environmentalData.filter(d => d.humidity).map(d => d.humidity);
+    const soilMoistures = environmentalData.filter(d => d.soilMoisture).map(d => d.soilMoisture);
+
+    return {
+      temperatureAverage: Math.round(this.calculateAverage(temperatures) * 100) / 100,
+      temperatureTrend: this.calculateTrend(temperatures),
+      humidityAverage: Math.round(this.calculateAverage(humidities) * 100) / 100,
+      humidityTrend: this.calculateTrend(humidities),
+      soilMoistureAverage: Math.round(this.calculateAverage(soilMoistures) * 100) / 100,
+      soilMoistureTrend: this.calculateTrend(soilMoistures),
+    };
+  }
+
+  private calculateTrend(values: number[]): 'improving' | 'stable' | 'declining' {
+    if (values.length < 2) return 'stable';
+    
+    const firstHalf = this.calculateAverage(values.slice(0, Math.floor(values.length / 2)));
+    const secondHalf = this.calculateAverage(values.slice(Math.floor(values.length / 2)));
+    const change = ((secondHalf - firstHalf) / firstHalf) * 100;
+    
+    if (Math.abs(change) < 5) return 'stable';
+    return change > 0 ? 'improving' : 'declining';
+  }
+
+  private calculateDiseaseFrequency(healthLogs: any[]): any {
+    const totalEntries = healthLogs.length;
+    const diseaseDetections = healthLogs.filter(log => log.aiAnalysis?.diseaseDetected).length;
+    const diseaseDetectionRate = totalEntries > 0 ? (diseaseDetections / totalEntries) * 100 : 0;
+
+    // Count disease types
+    const diseaseTypes = {};
+    healthLogs.forEach(log => {
+      if (log.aiAnalysis?.diseaseDetected && log.aiAnalysis?.diseaseType) {
+        const diseaseType = log.aiAnalysis.diseaseType;
+        if (!diseaseTypes[diseaseType]) {
+          diseaseTypes[diseaseType] = { count: 0, lastDetected: null };
+        }
+        diseaseTypes[diseaseType].count++;
+        diseaseTypes[diseaseType].lastDetected = new Date(log.recordedAt);
+      }
+    });
+
+    const commonDiseases = Object.entries(diseaseTypes)
+      .map(([type, data]: [string, any]) => ({
+        type,
+        frequency: (data.count / totalEntries) * 100,
+        lastDetected: data.lastDetected,
+      }))
+      .sort((a, b) => b.frequency - a.frequency)
+      .slice(0, 5);
+
+    // Calculate risk trend
+    const recentDetections = healthLogs.slice(-5).filter(log => log.aiAnalysis?.diseaseDetected).length;
+    const olderDetections = healthLogs.slice(-10, -5).filter(log => log.aiAnalysis?.diseaseDetected).length;
+    
+    let riskTrend: 'increasing' | 'stable' | 'decreasing' = 'stable';
+    if (recentDetections > olderDetections) riskTrend = 'increasing';
+    else if (recentDetections < olderDetections) riskTrend = 'decreasing';
+
+    return {
+      totalEntries,
+      diseaseDetectionRate: Math.round(diseaseDetectionRate * 100) / 100,
+      commonDiseases,
+      riskTrend,
+    };
+  }
+
+  private calculateGrowthProgression(healthLogs: any[]): any {
+    const progressionData: {
+      heightProgression: { date: string; height: number }[];
+      leafCountProgression: { date: string; count: number }[];
+      flowerCountProgression: { date: string; count: number }[];
+      fruitCountProgression: { date: string; count: number }[];
+    } = {
+      heightProgression: [],
+      leafCountProgression: [],
+      flowerCountProgression: [],
+      fruitCountProgression: [],
+    };
+
+    healthLogs.forEach(log => {
+      const date = new Date(log.recordedAt).toISOString().split('T')[0];
+      if (log.metrics) {
+        if (log.metrics.plantHeight) {
+          progressionData.heightProgression.push({ date, height: log.metrics.plantHeight });
+        }
+        if (log.metrics.leafCount) {
+          progressionData.leafCountProgression.push({ date, count: log.metrics.leafCount });
+        }
+        if (log.metrics.flowerCount) {
+          progressionData.flowerCountProgression.push({ date, count: log.metrics.flowerCount });
+        }
+        if (log.metrics.fruitCount) {
+          progressionData.fruitCountProgression.push({ date, count: log.metrics.fruitCount });
+        }
+      }
+    });
+
+    // Calculate growth rates
+    const growthRate = {
+      height: this.calculateGrowthRate(progressionData.heightProgression.map(p => p.height)),
+      leafDevelopment: this.calculateGrowthRate(progressionData.leafCountProgression.map(p => p.count)),
+      flowering: this.calculateGrowthRate(progressionData.flowerCountProgression.map(p => p.count)),
+      fruiting: this.calculateGrowthRate(progressionData.fruitCountProgression.map(p => p.count)),
+    };
+
+    return {
+      ...progressionData,
+      growthRate,
+    };
+  }
+
+  private calculateGrowthRate(values: number[]): 'fast' | 'normal' | 'slow' {
+    if (values.length < 2) return 'normal';
+    
+    const growthRates: number[] = [];
+    for (let i = 1; i < values.length; i++) {
+      const rate = values[i] - values[i - 1];
+      growthRates.push(rate);
+    }
+    
+    const averageGrowthRate = this.calculateAverage(growthRates);
+    
+    if (averageGrowthRate > 2) return 'fast';
+    if (averageGrowthRate < 0.5) return 'slow';
+    return 'normal';
+  }
+
+  private generateRecommendations(healthScore: number, trend: string, diseaseAnalysis: any): any {
+    const recommendations: {
+      immediate: string[];
+      shortTerm: string[];
+      longTerm: string[];
+    } = {
+      immediate: [],
+      shortTerm: [],
+      longTerm: [],
+    };
+
+    // Immediate recommendations
+    if (healthScore < 70) {
+      recommendations.immediate.push('Immediate intervention required - health score below acceptable threshold');
+    }
+    if (diseaseAnalysis.diseaseDetectionRate > 30) {
+      recommendations.immediate.push('High disease detection rate - implement disease management protocols');
+    }
+    if (trend === 'declining') {
+      recommendations.immediate.push('Health trend declining - review and adjust care protocols');
+    }
+
+    // Short-term recommendations
+    recommendations.shortTerm.push('Continue regular monitoring and data collection');
+    if (diseaseAnalysis.riskTrend === 'increasing') {
+      recommendations.shortTerm.push('Increase disease monitoring frequency');
+    }
+    recommendations.shortTerm.push('Optimize environmental conditions based on trend analysis');
+
+    // Long-term recommendations
+    recommendations.longTerm.push('Implement predictive analytics for early warning systems');
+    recommendations.longTerm.push('Develop species-specific care protocols based on historical data');
+    recommendations.longTerm.push('Consider automated monitoring systems for continuous data collection');
+
+    return recommendations;
+  }
+
+  private generateAlerts(healthScore: number, trend: string, diseaseAnalysis: any): any[] {
+    const alerts: Array<{
+      type: 'warning' | 'error' | 'info';
+      message: string;
+      priority: 'high' | 'medium' | 'low';
+    }> = [];
+
+    if (healthScore < 60) {
+      alerts.push({
+        type: 'error',
+        message: 'Critical health score detected - immediate action required',
+        priority: 'high',
+      });
+    } else if (healthScore < 75) {
+      alerts.push({
+        type: 'warning',
+        message: 'Below average health score - monitor closely',
+        priority: 'medium',
+      });
+    }
+
+    if (trend === 'declining') {
+      alerts.push({
+        type: 'warning',
+        message: 'Health trend is declining - review care protocols',
+        priority: 'medium',
+      });
+    }
+
+    if (diseaseAnalysis.diseaseDetectionRate > 25) {
+      alerts.push({
+        type: 'warning',
+        message: 'High disease detection rate - implement preventive measures',
+        priority: 'high',
+      });
+    }
+
+    if (diseaseAnalysis.riskTrend === 'increasing') {
+      alerts.push({
+        type: 'warning',
+        message: 'Disease risk trend increasing - enhance monitoring',
+        priority: 'medium',
+      });
+    }
+
+    if (alerts.length === 0) {
+      alerts.push({
+        type: 'info',
+        message: 'Plant lot health is within normal parameters',
+        priority: 'low',
+      });
+    }
+
+    return alerts;
+  }
+
+  private getEmptyHistoricalAnalysis(): HistoricalAnalyticsResult {
+    return {
+      currentHealthStatus: {
+        healthScore: 75,
+        status: 'fair',
+        lastAnalyzed: new Date(),
+      },
+      historicalComparison: {
+        averageHealthScore: 75,
+        trendDirection: 'stable',
+        percentageChange: 0,
+        comparisonPeriod: '30 days',
+      },
+      healthTrends: [],
+      environmentalTrends: {
+        temperatureAverage: 0,
+        temperatureTrend: 'stable',
+        humidityAverage: 0,
+        humidityTrend: 'stable',
+        soilMoistureAverage: 0,
+        soilMoistureTrend: 'stable',
+      },
+      diseaseFrequencyAnalysis: {
+        totalEntries: 0,
+        diseaseDetectionRate: 0,
+        commonDiseases: [],
+        riskTrend: 'stable',
+      },
+      growthProgression: {
+        heightProgression: [],
+        leafCountProgression: [],
+        flowerCountProgression: [],
+        fruitCountProgression: [],
+        growthRate: {
+          height: 'normal',
+          leafDevelopment: 'normal',
+          flowering: 'moderate',
+          fruiting: 'moderate',
+        },
+      },
+      recommendations: {
+        immediate: ['Start collecting health data for analysis'],
+        shortTerm: ['Implement regular monitoring schedule'],
+        longTerm: ['Build comprehensive health tracking system'],
+      },
+      alerts: [{
+        type: 'info',
+        message: 'Insufficient data for comprehensive analysis',
+        priority: 'low',
+      }],
+    };
   }
 }
