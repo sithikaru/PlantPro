@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthLogsService } from './health-logs.service';
 import { HealthLogsController } from './health-logs.controller';
 import { HealthLog } from './health-log.entity';
-import { AIAnalysisService } from './services/ai-analysis.service';
 import { CommonModule } from '../common/common.module';
 
 @Module({
@@ -14,7 +13,6 @@ import { CommonModule } from '../common/common.module';
   controllers: [HealthLogsController],
   providers: [
     HealthLogsService,
-    AIAnalysisService,
   ],
   exports: [HealthLogsService],
 })

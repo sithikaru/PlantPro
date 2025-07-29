@@ -300,12 +300,6 @@ function PlantLotDetailPageClient({ lotId }: { lotId: number }) {
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      <Link href={`/health-logs/analytics/${plantLot.id}`}>
-                        <Button size="sm" variant="outline" className="rounded-xl">
-                          <Activity className="w-4 h-4 mr-2" />
-                          Analyze Health
-                        </Button>
-                      </Link>
                       <Link href={`/plant-lots/${plantLot.id}/health-log`}>
                         <Button size="sm" className="rounded-xl">
                           <Plus className="w-4 h-4 mr-2" />

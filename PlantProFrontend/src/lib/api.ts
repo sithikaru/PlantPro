@@ -146,15 +146,6 @@ export const healthLogsApi = {
   delete: (id: number): Promise<void> =>
     apiClient.delete(`/health-logs/${id}`),
 
-  retryAnalysis: (id: number): Promise<HealthLog> =>
-    apiClient.post(`/health-logs/${id}/retry-analysis`),
-
   getAnalytics: (plantLotId: number): Promise<Record<string, unknown>> =>
     apiClient.get(`/health-logs/analytics/${plantLotId}`),
-
-  getHistoricalAnalytics: (plantLotId: number): Promise<Record<string, unknown>> =>
-    apiClient.get(`/health-logs/historical-analytics/${plantLotId}`),
-
-  triggerAnalysis: (plantLotId: number): Promise<Record<string, unknown>> =>
-    apiClient.post(`/health-logs/trigger-analysis/${plantLotId}`),
 };

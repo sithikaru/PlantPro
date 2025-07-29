@@ -25,9 +25,9 @@ export interface DashboardSummary {
   };
 
   systemHealth: {
-    aiAnalysisSuccess: number;
-    pendingAnalysis: number;
     systemErrors: number;
+    activeConnections: number;
+    databaseStatus: string;
   };
 }
 

@@ -114,12 +114,6 @@ function HealthLogPageClient({ lotId }: { lotId: number }) {
           </div>
           
           <div className="flex space-x-3">
-            <Link href={`/health-logs/analytics/${plantLot.id}`}>
-              <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Analyze Health
-              </Button>
-            </Link>
             <Button
               onClick={() => setShowHealthForm(true)}
               className="bg-green-600 hover:bg-green-700 text-white"
