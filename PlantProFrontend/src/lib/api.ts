@@ -83,12 +83,36 @@ export const plantLotsApi = {
 export const plantSpeciesApi = {
   getAll: (): Promise<PlantSpecies[]> =>
     apiClient.get('/plant-species'),
+  
+  getById: (id: number): Promise<PlantSpecies> =>
+    apiClient.get(`/plant-species/${id}`),
+  
+  create: (data: any): Promise<PlantSpecies> =>
+    apiClient.post('/plant-species', data),
+  
+  update: (id: number, data: any): Promise<PlantSpecies> =>
+    apiClient.patch(`/plant-species/${id}`, data),
+  
+  delete: (id: number): Promise<void> =>
+    apiClient.delete(`/plant-species/${id}`),
 };
 
 // Zones API
 export const zonesApi = {
   getAll: (): Promise<Zone[]> =>
     apiClient.get('/zones'),
+  
+  getById: (id: number): Promise<Zone> =>
+    apiClient.get(`/zones/${id}`),
+  
+  create: (data: any): Promise<Zone> =>
+    apiClient.post('/zones', data),
+  
+  update: (id: number, data: any): Promise<Zone> =>
+    apiClient.patch(`/zones/${id}`, data),
+  
+  delete: (id: number): Promise<void> =>
+    apiClient.delete(`/zones/${id}`),
 };
 
 // Users API

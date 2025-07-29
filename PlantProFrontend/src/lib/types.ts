@@ -41,6 +41,15 @@ export interface PlantSpecies {
   harvestPeriodDays: number;
   expectedYieldPerPlant: number;
   yieldUnit: string;
+  optimalConditions?: {
+    temperature?: { min: number; max: number };
+    humidity?: { min: number; max: number };
+    soilPH?: { min: number; max: number };
+    sunlight?: string;
+  };
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Zone {

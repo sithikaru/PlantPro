@@ -81,7 +81,7 @@ export default function GlobalNavigation() {
         {
           icon: Database,
           label: 'Species & Zones',
-          href: '/admin',
+          href: '/species-zones',
           roles: ['manager'],
           description: 'Configure plant species and zones'
         }
